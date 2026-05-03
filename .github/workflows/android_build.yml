@@ -31,7 +31,7 @@ jobs:
       - name: ⚙️ Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 8.6
+          gradle-version: 8.10.2
 
       - name: ⚙️ Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -45,9 +45,14 @@ jobs:
         run: |
           cd mobile
           npx expo prebuild --platform android --no-install
-          # Aggressive fix: Replace all $kotlinVersion placeholders with 2.1.0
+          # Fix 1: Force Kotlin 2.1.0 in all Gradle files
           find android -name "*.gradle" -type f -exec sed -i 's/\$kotlinVersion/2.1.0/g' {} +
           find android -name "*.gradle" -type f -exec sed -i "s/kotlinVersion = .*/kotlinVersion = '2.1.0'/g" {} +
+          # Fix 2: Inject "packageDebugAssets" ghost property to fix Gradle 8.10 compatibility
+          sed -i '/allprojects {/a \    ext { packageDebugAssets = {} }' android/build.gradle
+          # Fix 3: Force Kotlin version in gradle.properties for plugins
+          echo "kotlinVersion=2.1.0" >> android/gradle.properties
+          echo "android.kotlin.version=2.1.0" >> android/gradle.properties
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
