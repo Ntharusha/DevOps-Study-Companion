@@ -7,6 +7,7 @@ import {
   HiOutlineTerminal,
   HiOutlineExclamation,
   HiOutlineTrendingUp,
+  HiOutlineBookOpen,
 } from 'react-icons/hi';
 
 function Sidebar({ open, onClose }) {
@@ -21,6 +22,7 @@ function Sidebar({ open, onClose }) {
     { to: '/commands', icon: <HiOutlineTerminal />, label: 'Commands' },
     { to: '/errors', icon: <HiOutlineExclamation />, label: 'Error Memory' },
     { to: '/reports', icon: <HiOutlineTrendingUp />, label: 'Reports & XP' },
+    { to: '/interview', icon: <HiOutlineBookOpen />, label: 'Interview Helper' },
   ];
 
   return (

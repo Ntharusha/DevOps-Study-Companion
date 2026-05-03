@@ -11,6 +11,7 @@ import LabDetail from './pages/LabDetail';
 import Commands from './pages/Commands';
 import Errors from './pages/Errors';
 import Reports from './pages/Reports';
+import InterviewHelper from './pages/InterviewHelper';
 import { HiMenu } from 'react-icons/hi';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route path="/commands" element={<Commands />} />
             <Route path="/errors" element={<Errors />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/interview" element={<InterviewHelper />} />
           </Routes>
         </main>
         <button

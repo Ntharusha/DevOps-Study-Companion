@@ -47,4 +47,12 @@ export const deleteError = (id) => api.delete(`/errors/${id}`);
 export const getWeeklyReport = () => api.get('/reports/weekly');
 export const getSkillScore = () => api.get('/reports/skill');
 
+// Interview API
+export const getInterviewQuestions = (params) => api.get('/interview/questions', { params });
+export const getRandomQuestions = (params) => api.get('/interview/random', { params });
+export const seedInterviewBank = () => api.get('/interview/seed');
+export const createInterviewQuestion = (data) => api.post('/interview/questions', data);
+export const toggleQuestionFavorite = (id) => api.patch(`/interview/questions/${id}/favorite`);
+export const deleteInterviewQuestion = (id) => api.delete(`/interview/questions/${id}`);
+
 export default api;
