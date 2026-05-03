@@ -12,7 +12,7 @@ import {
 import { COLORS, SPACING, RADIUS } from '../theme';
 import { login } from '../api';
 
-export default function LoginScreen({ onLogin }) {
+export default function LoginScreen({ navigation, onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -77,6 +77,13 @@ export default function LoginScreen({ onLogin }) {
             ) : (
               <Text style={styles.buttonText}>Sign In</Text>
             )}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.linkButton} 
+            onPress={() => navigation.navigate('Signup')}
+          >
+            <Text style={styles.linkText}>Don't have an account? Sign Up</Text>
           </TouchableOpacity>
         </View>
 
@@ -158,5 +165,14 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.lg,
     width: '100%',
     textAlign: 'center',
+  },
+  linkButton: {
+    marginTop: SPACING.xl,
+    alignItems: 'center',
+  },
+  linkText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

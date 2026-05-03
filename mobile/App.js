@@ -1,3 +1,4 @@
+import { registerRootComponent } from 'expo';
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
@@ -7,6 +8,7 @@ import { View, ActivityIndicator, Text } from 'react-native';
 
 import { COLORS } from './src/theme';
 import LoginScreen from './src/screens/LoginScreen';
+import SignupScreen from './src/screens/SignupScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import EntriesScreen from './src/screens/EntriesScreen';
 import LabsScreen from './src/screens/LabsScreen';
@@ -18,6 +20,7 @@ import MoreScreen from './src/screens/MoreScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
 
 // Sub-stacks for screens accessible from "More"
 function ToolsStack() {
@@ -109,9 +112,14 @@ export default function App() {
       <StatusBar style="light" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
-          <Stack.Screen name="Login">
-            {(props) => <LoginScreen {...props} onLogin={setUser} />}
-          </Stack.Screen>
+          <>
+            <Stack.Screen name="Login">
+              {(props) => <LoginScreen {...props} onLogin={setUser} />}
+            </Stack.Screen>
+            <Stack.Screen name="Signup">
+              {(props) => <SignupScreen {...props} onSignup={setUser} />}
+            </Stack.Screen>
+          </>
         ) : (
           <Stack.Screen name="Main" component={TabNavigator} />
         )}
@@ -119,3 +127,5 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+registerRootComponent(App);
