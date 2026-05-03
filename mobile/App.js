@@ -8,15 +8,33 @@ import { View, ActivityIndicator, Text } from 'react-native';
 import { COLORS } from './src/theme';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
+import EntriesScreen from './src/screens/EntriesScreen';
+import LabsScreen from './src/screens/LabsScreen';
+import ProjectsScreen from './src/screens/ProjectsScreen';
+import MemoryScreen from './src/screens/MemoryScreen';
+import CommandsScreen from './src/screens/CommandsScreen';
+import ReportsScreen from './src/screens/ReportsScreen';
+import MoreScreen from './src/screens/MoreScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Placeholder screens for other features (to be implemented)
-const EntriesScreen = () => <View style={{flex:1, backgroundColor: COLORS.background}} />;
-const LabsScreen = () => <View style={{flex:1, backgroundColor: COLORS.background}} />;
-const ProjectsScreen = () => <View style={{flex:1, backgroundColor: COLORS.background}} />;
-const MemoryScreen = () => <View style={{flex:1, backgroundColor: COLORS.background}} />;
+// Sub-stacks for screens accessible from "More"
+function ToolsStack() {
+  return (
+    <Stack.Navigator screenOptions={{ 
+      headerStyle: { backgroundColor: COLORS.card },
+      headerTintColor: COLORS.text,
+      headerTitleStyle: { fontWeight: '800' }
+    }}>
+      <Stack.Screen name="Menu" component={MoreScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Projects" component={ProjectsScreen} />
+      <Stack.Screen name="Memory" component={MemoryScreen} />
+      <Stack.Screen name="Commands" component={CommandsScreen} />
+      <Stack.Screen name="Reports" component={ReportsScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function TabNavigator() {
   return (
@@ -24,44 +42,45 @@ function TabNavigator() {
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.card },
         headerTintColor: COLORS.text,
-        tabBarStyle: { backgroundColor: COLORS.card, borderTopColor: COLORS.border },
+        headerTitleStyle: { fontWeight: '800' },
+        tabBarStyle: { 
+          backgroundColor: COLORS.card, 
+          borderTopColor: COLORS.border,
+          height: 70,
+          paddingBottom: 10,
+        },
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textMuted,
+        tabBarLabelStyle: { fontSize: 12, fontWeight: '700' },
       }}
     >
-      <Tab.Screen 
-        name="Dashboard" 
-        component={DashboardScreen} 
+      <Tab.Screen
+        name="Dashboard"
+        component={DashboardScreen}
         options={{
-          tabBarIcon: ({ color }) => <View style={{width: 20, height: 20, backgroundColor: color}} />
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>📊</Text>
         }}
       />
-      <Tab.Screen 
-        name="Entries" 
-        component={EntriesScreen} 
+      <Tab.Screen
+        name="Entries"
+        component={EntriesScreen}
         options={{
-          tabBarIcon: ({ color }) => <View style={{width: 20, height: 20, backgroundColor: color}} />
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>📝</Text>
         }}
       />
-      <Tab.Screen 
-        name="Labs" 
-        component={LabsScreen} 
+      <Tab.Screen
+        name="Labs"
+        component={LabsScreen}
         options={{
-          tabBarIcon: ({ color }) => <View style={{width: 20, height: 20, backgroundColor: color}} />
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>🧪</Text>
         }}
       />
-      <Tab.Screen 
-        name="Projects" 
-        component={ProjectsScreen} 
+      <Tab.Screen
+        name="More"
+        component={ToolsStack}
         options={{
-          tabBarIcon: ({ color }) => <View style={{width: 20, height: 20, backgroundColor: color}} />
-        }}
-      />
-      <Tab.Screen 
-        name="Memory" 
-        component={MemoryScreen} 
-        options={{
-          tabBarIcon: ({ color }) => <View style={{width: 20, height: 20, backgroundColor: color}} />
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>➕</Text>,
+          headerShown: false
         }}
       />
     </Tab.Navigator>

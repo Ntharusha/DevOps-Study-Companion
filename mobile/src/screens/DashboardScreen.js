@@ -6,17 +6,52 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
-import { COLORS, SPACING, RADIUS } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, SPACING, RADIUS, GRADIENTS, SHADOWS } from '../theme';
 import { getStats } from '../api';
 
-const StatCard = ({ label, value, sub, color }) => (
-  <View style={[styles.statCard, { borderLeftColor: color }]}>
-    <Text style={styles.statLabel}>{label}</Text>
-    <Text style={styles.statValue}>{value}</Text>
-    <Text style={styles.statSub}>{sub}</Text>
-  </View>
-);
+const StatCard = ({ label, value, sub, colors, index }) => {
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+  const slideAnim = React.useRef(new Animated.Value(20)).current;
+
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        delay: index * 100,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View style={[
+      styles.statCard, 
+      SHADOWS.md,
+      { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
+    ]}>
+      <LinearGradient
+        colors={colors || GRADIENTS.dark}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.cardGradient}
+      >
+        <Text style={styles.statLabel}>{label}</Text>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statSub}>{sub}</Text>
+      </LinearGradient>
+    </Animated.View>
+  );
+};
 
 export default function DashboardScreen() {
   const [stats, setStats] = useState(null);
@@ -74,28 +109,32 @@ export default function DashboardScreen() {
 
       <View style={styles.statsGrid}>
         <StatCard
+          index={0}
           label="Study Days"
           value={stats.totalStudyDays}
           sub="Total active days"
-          color={COLORS.primary}
+          colors={GRADIENTS.primary}
         />
         <StatCard
+          index={1}
           label="Streak"
           value={`${stats.currentStreak} 🔥`}
           sub={`Longest: ${stats.longestStreak} days`}
-          color={COLORS.warning}
+          colors={GRADIENTS.secondary}
         />
         <StatCard
+          index={2}
           label="Total Hours"
           value={`${stats.totalHours}h`}
           sub={`Avg ${stats.avgHoursPerDay}h/day`}
-          color={COLORS.secondary}
+          colors={['#f472b6', '#db2777']}
         />
         <StatCard
+          index={3}
           label="Total Entries"
           value={stats.totalEntries}
           sub="Sessions logged"
-          color={COLORS.accent}
+          colors={['#fbbf24', '#f59e0b']}
         />
       </View>
 
@@ -153,28 +192,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   statCard: {
-    backgroundColor: COLORS.card,
     width: '48%',
-    padding: SPACING.md,
-    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
     marginBottom: SPACING.md,
-    borderLeftWidth: 4,
+    overflow: 'hidden',
+  },
+  cardGradient: {
+    padding: SPACING.lg,
+    height: '100%',
   },
   statLabel: {
-    fontSize: 12,
-    color: COLORS.textMuted,
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 10,
+    fontWeight: '800',
     textTransform: 'uppercase',
-    fontWeight: '700',
+    letterSpacing: 1,
+    marginBottom: 8,
   },
   statValue: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.text,
-    marginVertical: 4,
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '900',
+    marginBottom: 4,
   },
   statSub: {
-    fontSize: 10,
-    color: COLORS.textMuted,
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 11,
+    fontWeight: '600',
   },
   section: {
     padding: SPACING.lg,
