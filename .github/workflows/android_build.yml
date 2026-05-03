@@ -45,6 +45,8 @@ jobs:
         run: |
           cd mobile
           npx expo prebuild --platform android --no-install
+          # Force Kotlin version in gradle.properties
+          echo "kotlinVersion=2.1.0" >> android/gradle.properties
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
