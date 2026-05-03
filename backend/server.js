@@ -12,6 +12,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/entries', require('./routes/entries'));
+app.use('/api/labs', require('./routes/labs'));
+app.use('/api/commands', require('./routes/commands'));
+app.use('/api/errors', require('./routes/errors'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Health check
 app.get('/api/health', (req, res) => {

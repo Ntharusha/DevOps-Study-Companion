@@ -6,6 +6,11 @@ import Dashboard from './pages/Dashboard';
 import NewEntry from './pages/NewEntry';
 import Entries from './pages/Entries';
 import EditEntry from './pages/EditEntry';
+import Labs from './pages/Labs';
+import LabDetail from './pages/LabDetail';
+import Commands from './pages/Commands';
+import Errors from './pages/Errors';
+import Reports from './pages/Reports';
 import { HiMenu } from 'react-icons/hi';
 
 function App() {
@@ -21,6 +26,11 @@ function App() {
             <Route path="/new" element={<NewEntry />} />
             <Route path="/entries" element={<Entries />} />
             <Route path="/edit/:id" element={<EditEntry />} />
+            <Route path="/labs" element={<Labs />} />
+            <Route path="/labs/:id" element={<LabDetail />} />
+            <Route path="/commands" element={<Commands />} />
+            <Route path="/errors" element={<Errors />} />
+            <Route path="/reports" element={<Reports />} />
           </Routes>
         </main>
         <button

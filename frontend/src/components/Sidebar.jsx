@@ -3,13 +3,24 @@ import {
   HiOutlineChartBar,
   HiOutlinePlusCircle,
   HiOutlineClipboardList,
+  HiOutlineBeaker,
+  HiOutlineTerminal,
+  HiOutlineExclamation,
+  HiOutlineTrendingUp,
 } from 'react-icons/hi';
 
 function Sidebar({ open, onClose }) {
-  const links = [
+  const mainLinks = [
     { to: '/', icon: <HiOutlineChartBar />, label: 'Dashboard' },
     { to: '/new', icon: <HiOutlinePlusCircle />, label: 'New Entry' },
     { to: '/entries', icon: <HiOutlineClipboardList />, label: 'All Entries' },
+  ];
+
+  const toolLinks = [
+    { to: '/labs', icon: <HiOutlineBeaker />, label: 'Lab Logger' },
+    { to: '/commands', icon: <HiOutlineTerminal />, label: 'Commands' },
+    { to: '/errors', icon: <HiOutlineExclamation />, label: 'Error Memory' },
+    { to: '/reports', icon: <HiOutlineTrendingUp />, label: 'Reports & XP' },
   ];
 
   return (
@@ -30,11 +41,15 @@ function Sidebar({ open, onClose }) {
           <div className="sidebar-logo-icon">🚀</div>
           <h1>
             DevOps Tracker
-            <span>Daily Work Companion</span>
+            <span>Study Companion</span>
           </h1>
         </div>
         <nav className="sidebar-nav">
-          {links.map((link) => (
+          {/* Main Section */}
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '8px 16px 4px', fontWeight: 700 }}>
+            Daily Tracker
+          </div>
+          {mainLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -48,13 +63,31 @@ function Sidebar({ open, onClose }) {
               {link.label}
             </NavLink>
           ))}
+
+          {/* Tools Section */}
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '20px 16px 4px', fontWeight: 700 }}>
+            DevOps Tools
+          </div>
+          {toolLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                `nav-link ${isActive ? 'active' : ''}`
+              }
+              onClick={onClose}
+            >
+              {link.icon}
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
         <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border-color)' }}>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            Phase 1 — MVP
+            Phase 2 — Enhanced
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            v1.0.0
+            v2.0.0
           </div>
         </div>
       </aside>
