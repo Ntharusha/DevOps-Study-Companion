@@ -11,16 +11,6 @@
     "android": {
       "package": "com.ghost69.devopscompanion",
       "versionCode": 1
-    },
-    "plugins": [
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "kotlinVersion": "2.1.0"
-          }
-        }
-      ]
-    ]
+    }
   }
 }
