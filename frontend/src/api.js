@@ -7,6 +7,23 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Auth API
+export const login = (credentials) => api.post('/auth/login', credentials);
+
+// Projects API
+export const getProjects = () => api.get('/projects');
+export const getProject = (id) => api.get(`/projects/${id}`);
+export const createProject = (data) => api.post('/projects', data);
+export const updateProject = (id, data) => api.put(`/projects/${id}`, data);
+export const addProjectTime = (id, hours) => api.patch(`/projects/${id}/time`, { hours });
+export const deleteProject = (id) => api.delete(`/projects/${id}`);
+
+// Memory Bank API
+export const getMemoryItems = (params) => api.get('/memory', { params });
+export const createMemoryItem = (data) => api.post('/memory', data);
+export const reviewMemoryItem = (id, strength) => api.patch(`/memory/${id}/review`, { strength });
+export const deleteMemoryItem = (id) => api.delete(`/memory/${id}`);
+
 // Entries API
 export const getEntries = (params) => api.get('/entries', { params });
 export const getStats = () => api.get('/entries/stats');

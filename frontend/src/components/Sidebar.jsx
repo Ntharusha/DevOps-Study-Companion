@@ -8,9 +8,13 @@ import {
   HiOutlineExclamation,
   HiOutlineTrendingUp,
   HiOutlineBookOpen,
+  HiOutlineLogout,
+  HiOutlineUserCircle,
+  HiOutlineFolderAdd,
+  HiOutlineLightningBolt,
 } from 'react-icons/hi';
 
-function Sidebar({ open, onClose }) {
+function Sidebar({ open, onClose, user, onLogout }) {
   const mainLinks = [
     { to: '/', icon: <HiOutlineChartBar />, label: 'Dashboard' },
     { to: '/new', icon: <HiOutlinePlusCircle />, label: 'New Entry' },
@@ -23,6 +27,8 @@ function Sidebar({ open, onClose }) {
     { to: '/errors', icon: <HiOutlineExclamation />, label: 'Error Memory' },
     { to: '/reports', icon: <HiOutlineTrendingUp />, label: 'Reports & XP' },
     { to: '/interview', icon: <HiOutlineBookOpen />, label: 'Interview Helper' },
+    { to: '/projects', icon: <HiOutlineFolderAdd />, label: 'Project Tracker' },
+    { to: '/memory', icon: <HiOutlineLightningBolt />, label: 'Memory Bank' },
   ];
 
   return (
@@ -84,14 +90,74 @@ function Sidebar({ open, onClose }) {
             </NavLink>
           ))}
         </nav>
-        <div style={{ padding: '16px 24px', borderTop: '1px solid var(--border-color)' }}>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            Phase 2 — Enhanced
-          </div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            v2.0.0
+        
+        <div className="sidebar-footer">
+          <div className="user-profile">
+            <HiOutlineUserCircle className="user-avatar" />
+            <div className="user-info">
+              <span className="user-name">{user?.username || 'User'}</span>
+              <span className="user-role">Administrator</span>
+            </div>
+            <button className="logout-btn" onClick={onLogout} title="Logout">
+              <HiOutlineLogout />
+            </button>
           </div>
         </div>
+
+        <style>{`
+          .sidebar-footer {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+          }
+          .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+          }
+          .user-avatar {
+            font-size: 1.8rem;
+            color: var(--accent-primary);
+            flex-shrink: 0;
+          }
+          .user-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            flex: 1;
+          }
+          .user-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .user-role {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+          }
+          .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+          }
+          .logout-btn:hover {
+            color: var(--error);
+            background: rgba(239, 68, 68, 0.1);
+          }
+        `}</style>
       </aside>
     </>
   );
