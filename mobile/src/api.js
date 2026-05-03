@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use your local IP for physical devices or 10.0.2.2 for Android Emulator
-const BASE_URL = 'http://192.168.1.211:5001/api';
+const BASE_URL = 'http://192.168.1.211:5000/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -18,14 +18,19 @@ export const createEntry = (data) => api.post('/entries', data);
 
 export const getLabs = () => api.get('/labs');
 export const getLab = (id) => api.get(`/labs/${id}`);
+export const createLab = (data) => api.post('/labs', data);
 export const updateLab = (id, data) => api.put(`/labs/${id}`, data);
 export const addLabStep = (id, data) => api.post(`/labs/${id}/steps`, data);
 
 export const getProjects = () => api.get('/projects');
+export const createProject = (data) => api.post('/projects', data);
 export const addProjectTime = (id, hours) => api.patch(`/projects/${id}/time`, { hours });
 
 export const getMemoryItems = (params) => api.get('/memory', { params });
+export const createMemoryItem = (data) => api.post('/memory', data);
 export const reviewMemoryItem = (id, strength) => api.patch(`/memory/${id}/review`, { strength });
+
+export const getCommands = () => api.get('/commands');
 
 export const getInterviewQuestions = (params) => api.get('/interview/questions', { params });
 export const getRandomQuestions = (params) => api.get('/interview/random', { params });

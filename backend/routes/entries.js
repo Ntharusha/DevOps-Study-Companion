@@ -140,6 +140,16 @@ router.get('/stats', async (req, res) => {
       difficultyCount[e.difficulty]++;
     });
 
+    // Calculate XP and Levels
+    const totalXP = (totalHours * 100) + (totalEntries * 10);
+    const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
+
+    // Fetch counts from other collections
+    const Labs = require('../models/Lab');
+    const Memory = require('../models/Memory');
+    const labsCompleted = await Labs.countDocuments({ status: 'completed' });
+    const memoriesMastered = await Memory.countDocuments({ strength: { $gte: 4 } });
+
     // Average hours per day
     const avgHoursPerDay =
       totalStudyDays > 0
@@ -155,6 +165,10 @@ router.get('/stats', async (req, res) => {
         currentStreak,
         longestStreak,
         avgHoursPerDay,
+        totalXP,
+        level,
+        labsCompleted,
+        memoriesMastered,
         weeklyActivity,
         topicDistribution,
         difficultyDistribution: difficultyCount,

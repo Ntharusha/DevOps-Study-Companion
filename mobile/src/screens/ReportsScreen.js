@@ -54,6 +54,17 @@ export default function ReportsScreen() {
     );
   }
 
+  if (!stats) {
+    return (
+      <View style={styles.center}>
+        <Text style={{color: COLORS.text}}>Failed to load statistics.</Text>
+        <TouchableOpacity onPress={fetchData} style={{marginTop: 20}}>
+          <Text style={{color: COLORS.primary}}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <ScrollView 
       style={styles.container}

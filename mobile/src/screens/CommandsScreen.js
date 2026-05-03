@@ -26,7 +26,7 @@ const CommandItem = ({ item }) => (
     </View>
     <Text style={styles.desc}>{item.description}</Text>
     <View style={styles.tags}>
-      {item.tags.map(tag => (
+      {item.tags?.map(tag => (
         <Text key={tag} style={styles.tag}>#{tag}</Text>
       ))}
     </View>
@@ -53,10 +53,10 @@ export default function CommandsScreen() {
     fetchCommands();
   }, []);
 
-  const filtered = commands.filter(c => 
-    c.command.toLowerCase().includes(search.toLowerCase()) ||
-    c.description.toLowerCase().includes(search.toLowerCase()) ||
-    c.category.toLowerCase().includes(search.toLowerCase())
+  const filtered = (commands || []).filter(c => 
+    c.command?.toLowerCase().includes(search.toLowerCase()) ||
+    c.description?.toLowerCase().includes(search.toLowerCase()) ||
+    c.category?.toLowerCase().includes(search.toLowerCase())
   );
 
   if (loading) {

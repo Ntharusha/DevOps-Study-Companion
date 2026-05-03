@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, RADIUS, GRADIENTS, SHADOWS } from '../theme';
 import { getStats } from '../api';
 
@@ -37,18 +36,14 @@ const StatCard = ({ label, value, sub, colors, index }) => {
     <Animated.View style={[
       styles.statCard, 
       SHADOWS.md,
+      { backgroundColor: colors ? colors[0] : COLORS.card },
       { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
     ]}>
-      <LinearGradient
-        colors={colors || GRADIENTS.dark}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.cardGradient}
-      >
+      <View style={styles.cardContent}>
         <Text style={styles.statLabel}>{label}</Text>
         <Text style={styles.statValue}>{value}</Text>
         <Text style={styles.statSub}>{sub}</Text>
-      </LinearGradient>
+      </View>
     </Animated.View>
   );
 };
@@ -198,9 +193,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     overflow: 'hidden',
   },
-  cardGradient: {
+  cardContent: {
     padding: SPACING.lg,
-    height: '100%',
   },
   statLabel: {
     color: 'rgba(255,255,255,0.7)',
