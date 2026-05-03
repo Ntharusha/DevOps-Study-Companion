@@ -28,6 +28,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: ⚙️ Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.6
+
       - name: ⚙️ Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -36,11 +41,10 @@ jobs:
           cd mobile
           npm install
 
-      - name: 🛠 Build APK
+      - name: 🛠 Prebuild
         run: |
           cd mobile
-          # Prebuild generates the android folder
-          npx expo prebuild --platform android
+          npx expo prebuild --platform android --no-install
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease
