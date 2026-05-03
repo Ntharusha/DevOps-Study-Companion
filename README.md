@@ -1,6 +1,6 @@
 # 🚀 DevOps Study Companion (Full-Stack & DevOps Portfolio Project)
 
-**DevOps Study Companion** is a comprehensive productivity and learning platform designed specifically for DevOps engineers and learners. 
+**DevOps Study Companion** is a comprehensive productivity and learning platform designed specifically for DevOps learners. 
 
 More importantly, this repository serves as a **live demonstration of modern DevOps practices**. The project is structured as a multi-tier monorepo (Frontend, Backend, Mobile) wrapped in enterprise-grade infrastructure, CI/CD automation, and Infrastructure as Code (IaC).
 
