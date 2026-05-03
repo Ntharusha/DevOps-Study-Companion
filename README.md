@@ -1,6 +1,6 @@
-# DevOps Daily Work Tracker
+# DevOps Study Companion
 
-A web application to track daily DevOps learning activities, maintain consistency streaks, and monitor your progress.
+DevOps Study Companion is a web-based productivity and learning platform designed specifically for DevOps learners. It helps users track their daily study tasks, monitor progress across a structured roadmap, and log hands-on practice such as commands, errors, and solutions.
 
 ## 🚀 Tech Stack
 
