@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@react-native-community/cli": "^15.0.1",
     "babel-preset-expo": "~54.0.10"
   },
   "private": true
