@@ -64,7 +64,14 @@ export default function LabsScreen() {
   };
 
   const handleCreate = async () => {
-    if (!form.title || !form.topic) return;
+    if (!form.title) {
+      alert('Lab title is required');
+      return;
+    }
+    if (!form.topic) {
+      alert('Lab topic is required');
+      return;
+    }
     try {
       const payload = {
         ...form,
@@ -155,16 +162,16 @@ export default function LabsScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-            </ScrollView>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
-                <Text style={styles.saveBtnText}>Save Lab</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
+                  <Text style={styles.saveBtnText}>Save Lab</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

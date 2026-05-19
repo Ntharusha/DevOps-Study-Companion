@@ -70,12 +70,19 @@ export default function FocusTimerScreen() {
       durationMinutes = phase === 'work' ? parseInt(customWorkMin) : parseInt(customBreakMin);
     } else if (mode === 'countdown') {
       durationMinutes = parseInt(customWorkMin);
+    } else if (mode === 'stopwatch') {
+      durationMinutes = Math.round(timeLeft / 60);
+      if (durationMinutes === 0 && timeLeft > 0) {
+        durationMinutes = 1; // Round up to 1 minute minimum
+      }
     }
 
     if (mode === 'pomodoro' && phase === 'work') {
       alert('Focus session complete! Take a break. 🍅');
     } else if (mode === 'countdown') {
       alert('Countdown complete! ⏰');
+    } else if (mode === 'stopwatch') {
+      alert(`Stopwatch session complete! Logged ${durationMinutes} mins. ⏱️`);
     }
 
     try {
@@ -174,6 +181,11 @@ export default function FocusTimerScreen() {
           <TouchableOpacity style={styles.btnReset} onPress={resetTimer}>
             <Text style={styles.btnResetText}>🔄 RESET</Text>
           </TouchableOpacity>
+          {mode === 'stopwatch' && timeLeft > 0 && (
+            <TouchableOpacity style={styles.btnDone} onPress={handleSessionComplete}>
+              <Text style={styles.btnDoneText}>✓ DONE</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -258,6 +270,8 @@ const styles = StyleSheet.create({
   btnPlayText: { color: '#fff', fontWeight: '800' },
   btnReset: { backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border },
   btnResetText: { color: COLORS.text, fontWeight: '700' },
+  btnDone: { backgroundColor: COLORS.success, paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md },
+  btnDoneText: { color: '#fff', fontWeight: '800' },
   card: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
   cardTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800', marginBottom: SPACING.md },
   label: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' },
