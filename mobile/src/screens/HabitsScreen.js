@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   activeCatChip: { borderColor: COLORS.primary, backgroundColor: 'rgba(99, 102, 241, 0.15)' },
   catChipText: { color: COLORS.text, fontSize: 12, fontWeight: '600' },
   emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.md },
-  emojiChip: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center', borderRadius: RADIUS.sm, borderContext: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
+  emojiChip: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center', borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, backgroundColor: COLORS.background },
   activeEmojiChip: { borderColor: COLORS.primary, backgroundColor: 'rgba(99, 102, 241, 0.15)' },
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.lg },
   colorChip: { width: 28, height: 28, borderRadius: 14 },

@@ -145,7 +145,7 @@ export default function DashboardScreen() {
               <View 
                 style={[
                   styles.progressFill, 
-                  { width: `${(topic.hours / stats.totalHours) * 100}%` }
+                  { width: `${stats.totalHours > 0 ? ((topic.hours / stats.totalHours) * 100) : 0}%` }
                 ]} 
               />
             </View>
