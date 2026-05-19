@@ -14,20 +14,26 @@ import {
 import { COLORS, SPACING, RADIUS } from '../theme';
 import { getLabs, createLab } from '../api';
 
+const LAB_TOPICS = [
+  'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
+  'Ansible', 'Git', 'Networking', 'Monitoring', 'Security',
+  'Scripting', 'Nginx', 'Jenkins', 'Other'
+];
+
 const LabItem = ({ item }) => (
   <View style={styles.labCard}>
     <View style={styles.labHeader}>
-      <Text style={styles.labCategory}>{item.category}</Text>
+      <Text style={styles.labCategory}>{item.topic}</Text>
       <View style={[styles.statusTag, { backgroundColor: item.status === 'completed' ? COLORS.success : COLORS.warning }]}>
         <Text style={styles.statusText}>{item.status}</Text>
       </View>
     </View>
     <Text style={{color: COLORS.text, fontSize: 18, fontWeight: '700', marginBottom: 8}}>{item.title}</Text>
-    <Text style={styles.labDesc} numberOfLines={2}>{item.objective}</Text>
+    <Text style={styles.labDesc} numberOfLines={2}>{item.description}</Text>
     
     <View style={styles.labFooter}>
       <Text style={styles.labSteps}>{item.steps?.length || 0} Steps</Text>
-      <Text style={styles.labXP}>+{item.xpGained || 0} XP</Text>
+      <Text style={styles.labXP}>{item.duration || 0} mins</Text>
     </View>
   </View>
 );
@@ -39,9 +45,10 @@ export default function LabsScreen() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
     title: '',
-    category: '',
-    objective: '',
-    status: 'planned',
+    topic: 'Docker',
+    description: '',
+    status: 'in-progress',
+    duration: '30',
   });
 
   const fetchLabs = async () => {
@@ -57,14 +64,20 @@ export default function LabsScreen() {
   };
 
   const handleCreate = async () => {
-    if (!form.title || !form.category) return;
+    if (!form.title || !form.topic) return;
     try {
-      const { data } = await createLab(form);
-      setLabs([data.data, ...labs]);
-      setShowModal(false);
-      setForm({ title: '', category: '', objective: '', status: 'planned' });
+      const payload = {
+        ...form,
+        duration: parseInt(form.duration) || 0
+      };
+      const { data } = await createLab(payload);
+      if (data.success) {
+        setLabs([data.data, ...labs]);
+        setShowModal(false);
+        setForm({ title: '', topic: 'Docker', description: '', status: 'in-progress', duration: '30' });
+      }
     } catch (error) {
-      alert('Failed to create lab');
+      alert(error.response?.data?.message || 'Failed to create lab');
     }
   };
 
@@ -112,14 +125,27 @@ export default function LabsScreen() {
               <Text style={styles.label}>Lab Title</Text>
               <TextInput style={styles.input} value={form.title} onChangeText={t => setForm({...form, title: t})} placeholder="What's the lab name?" placeholderTextColor={COLORS.textMuted} />
               
-              <Text style={styles.label}>Category</Text>
-              <TextInput style={styles.input} value={form.category} onChangeText={t => setForm({...form, category: t})} placeholder="e.g. AWS S3, Docker Compose" placeholderTextColor={COLORS.textMuted} />
+              <Text style={styles.label}>Topic</Text>
+              <View style={styles.topicGrid}>
+                {LAB_TOPICS.map(t => (
+                  <TouchableOpacity 
+                    key={t} 
+                    style={[styles.topicChip, form.topic === t && styles.topicChipActive]}
+                    onPress={() => setForm({...form, topic: t})}
+                  >
+                    <Text style={[styles.topicChipText, form.topic === t && styles.topicChipTextActive]}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
               
-              <Text style={styles.label}>Objective</Text>
-              <TextInput style={[styles.input, {height: 80}]} value={form.objective} onChangeText={t => setForm({...form, objective: t})} multiline placeholder="Goal of this lab..." placeholderTextColor={COLORS.textMuted} />
+              <Text style={styles.label}>Duration (minutes)</Text>
+              <TextInput style={styles.input} value={form.duration} onChangeText={t => setForm({...form, duration: t})} keyboardType="numeric" placeholder="e.g. 45" placeholderTextColor={COLORS.textMuted} />
+
+              <Text style={styles.label}>Description</Text>
+              <TextInput style={[styles.input, {height: 80}]} value={form.description} onChangeText={t => setForm({...form, description: t})} multiline placeholder="Goal of this lab..." placeholderTextColor={COLORS.textMuted} />
               
               <View style={styles.statusRow}>
-                {['planned', 'completed'].map(status => (
+                {['in-progress', 'completed'].map(status => (
                   <TouchableOpacity 
                     key={status} 
                     style={[styles.statusBtn, form.status === status && styles.statusBtnActive]}
@@ -275,6 +301,33 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  topicGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginVertical: 4,
+  },
+  topicChip: {
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  topicChipActive: {
+    borderColor: COLORS.secondary,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+  },
+  topicChipText: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  topicChipTextActive: {
+    color: COLORS.text,
+    fontWeight: '800',
   },
   statusRow: {
     flexDirection: 'row',
