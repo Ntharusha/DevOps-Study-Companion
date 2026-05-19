@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
 import { saveTimerSession, getTimerStats } from '../api';
@@ -23,6 +24,10 @@ export default function FocusTimerScreen() {
   const [selectedTopic, setSelectedTopic] = useState('Kubernetes');
   const [stats, setStats] = useState({ totalSessions: 0, totalHours: 0 });
   const [loading, setLoading] = useState(false);
+  const [targetSessions, setTargetSessions] = useState('4');
+  const [sessionCount, setSessionCount] = useState(0);
+  const [autoStartBreak, setAutoStartBreak] = useState(true);
+  const [autoResumeWork, setAutoResumeWork] = useState(true);
 
   const timerRef = useRef(null);
 
@@ -77,12 +82,17 @@ export default function FocusTimerScreen() {
       }
     }
 
+    let currentCount = sessionCount;
     if (mode === 'pomodoro' && phase === 'work') {
+      currentCount += 1;
+      setSessionCount(currentCount);
       alert('Focus session complete! Take a break. 🍅');
     } else if (mode === 'countdown') {
       alert('Countdown complete! ⏰');
     } else if (mode === 'stopwatch') {
       alert(`Stopwatch session complete! Logged ${durationMinutes} mins. ⏱️`);
+    } else if (mode === 'pomodoro' && phase === 'break') {
+      alert('☕ Break over! Time to focus.');
     }
 
     try {
@@ -103,11 +113,23 @@ export default function FocusTimerScreen() {
     // Toggle Phase for Pomodoro
     if (mode === 'pomodoro') {
       if (phase === 'work') {
-        setPhase('break');
-        setTimeLeft(parseInt(customBreakMin) * 60);
+        if (autoStartBreak && currentCount < parseInt(targetSessions)) {
+          setPhase('break');
+          setTimeLeft(parseInt(customBreakMin) * 60);
+          setIsActive(true);
+        } else {
+          setPhase('work');
+          setTimeLeft(parseInt(customWorkMin) * 60);
+          if (currentCount >= parseInt(targetSessions)) {
+            alert(`🎉 All ${targetSessions} sessions completed! Great job!`);
+          }
+        }
       } else {
         setPhase('work');
         setTimeLeft(parseInt(customWorkMin) * 60);
+        if (autoResumeWork && currentCount < parseInt(targetSessions)) {
+          setIsActive(true);
+        }
       }
     } else {
       resetTimer();
@@ -173,6 +195,11 @@ export default function FocusTimerScreen() {
           </View>
         )}
         <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+        {mode === 'pomodoro' && (
+          <Text style={{color: COLORS.textMuted, fontSize: 14, marginTop: -10, marginBottom: 15, fontWeight: '600'}}>
+            Session {sessionCount} of {targetSessions}
+          </Text>
+        )}
 
         <View style={styles.controls}>
           <TouchableOpacity style={styles.btnPlay} onPress={handleStartPause}>
@@ -208,32 +235,48 @@ export default function FocusTimerScreen() {
         </View>
 
         {mode !== 'stopwatch' && (
-          <View style={styles.rowInputs}>
-            <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.label}>Work (Min)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={customWorkMin}
-                onChangeText={(text) => {
-                  setCustomWorkMin(text);
-                  if (!isActive) setTimeLeft(parseInt(text || '0') * 60);
-                }}
-              />
-            </View>
-            {mode === 'pomodoro' && (
-              <View style={{ flex: 1 }}>
+          <View>
+            <View style={styles.rowInputs}>
+              <View style={{ flex: 1, marginRight: 10 }}>
+                <Text style={styles.label}>Work (Min)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={customWorkMin}
+                  onChangeText={(text) => {
+                    setCustomWorkMin(text);
+                    if (!isActive) setTimeLeft(parseInt(text || '0') * 60);
+                  }}
+                />
+              </View>
+              <View style={{ flex: 1, marginRight: 10 }}>
                 <Text style={styles.label}>Break (Min)</Text>
                 <TextInput
                   style={styles.input}
                   keyboardType="numeric"
                   value={customBreakMin}
-                  onChangeText={(text) => {
-                    setCustomBreakMin(text);
-                  }}
+                  onChangeText={setCustomBreakMin}
                 />
               </View>
-            )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Sessions</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={targetSessions}
+                  onChangeText={setTargetSessions}
+                />
+              </View>
+            </View>
+            
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+              <Text style={{ color: COLORS.text, fontWeight: '600' }}>Auto-start breaks</Text>
+              <Switch value={autoStartBreak} onValueChange={setAutoStartBreak} trackColor={{ true: COLORS.primary }} />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
+              <Text style={{ color: COLORS.text, fontWeight: '600' }}>Auto-resume work</Text>
+              <Switch value={autoResumeWork} onValueChange={setAutoResumeWork} trackColor={{ true: COLORS.primary }} />
+            </View>
           </View>
         )}
       </View>

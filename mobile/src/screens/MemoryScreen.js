@@ -12,16 +12,21 @@ import {
   ScrollView,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
-import { getMemoryItems, reviewMemoryItem, createMemoryItem } from '../api';
+import { getMemoryItems, reviewMemoryItem, createMemoryItem, deleteMemoryItem } from '../api';
 
-const MemoryItem = ({ item, onReview }) => {
+const MemoryItem = ({ item, onReview, onDelete }) => {
   const [revealed, setRevealed] = useState(false);
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <Text style={styles.category}>{item.category}</Text>
-        <Text style={styles.strength}>Strength: {item.strength}/5</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={styles.strength}>Strength: {item.strength}/5</Text>
+          <TouchableOpacity onPress={() => onDelete(item._id)} style={styles.deleteBadge}>
+            <Text style={styles.deleteBadgeText}>✕</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <Text style={styles.concept}>{item.concept}</Text>
       
@@ -100,6 +105,17 @@ export default function MemoryScreen() {
     }
   };
 
+  const handleDeleteMemory = async (id) => {
+    try {
+      const { data } = await deleteMemoryItem(id);
+      if (data.success) {
+        setItems(prev => prev.filter(i => i._id !== id));
+      }
+    } catch (error) {
+      alert('Failed to delete memory item');
+    }
+  };
+
   useEffect(() => {
     fetchItems();
   }, []);
@@ -123,7 +139,7 @@ export default function MemoryScreen() {
 
       <FlatList
         data={items}
-        renderItem={({ item }) => <MemoryItem item={item} onReview={handleReview} />}
+        renderItem={({ item }) => <MemoryItem item={item} onReview={handleReview} onDelete={handleDeleteMemory} />}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -332,5 +348,20 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     color: COLORS.textMuted,
+  },
+  deleteBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+  deleteBadgeText: {
+    color: '#ef4444',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });

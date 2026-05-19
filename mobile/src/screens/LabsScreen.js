@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
-import { getLabs, createLab } from '../api';
+import { getLabs, createLab, deleteLab } from '../api';
 
 const LAB_TOPICS = [
   'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
@@ -20,12 +20,17 @@ const LAB_TOPICS = [
   'Scripting', 'Nginx', 'Jenkins', 'Other'
 ];
 
-const LabItem = ({ item }) => (
+const LabItem = ({ item, onDelete }) => (
   <View style={styles.labCard}>
     <View style={styles.labHeader}>
       <Text style={styles.labCategory}>{item.topic}</Text>
-      <View style={[styles.statusTag, { backgroundColor: item.status === 'completed' ? COLORS.success : COLORS.warning }]}>
-        <Text style={styles.statusText}>{item.status}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={[styles.statusTag, { backgroundColor: item.status === 'completed' ? COLORS.success : COLORS.warning }]}>
+          <Text style={styles.statusText}>{item.status}</Text>
+        </View>
+        <TouchableOpacity onPress={() => onDelete(item._id)} style={styles.deleteBadge}>
+          <Text style={styles.deleteBadgeText}>✕</Text>
+        </TouchableOpacity>
       </View>
     </View>
     <Text style={{color: COLORS.text, fontSize: 18, fontWeight: '700', marginBottom: 8}}>{item.title}</Text>
@@ -88,6 +93,17 @@ export default function LabsScreen() {
     }
   };
 
+  const handleDeleteLab = async (id) => {
+    try {
+      const { data } = await deleteLab(id);
+      if (data.success) {
+        setLabs(prev => prev.filter(l => l._id !== id));
+      }
+    } catch (error) {
+      alert('Failed to delete lab');
+    }
+  };
+
   useEffect(() => {
     fetchLabs();
   }, []);
@@ -111,7 +127,7 @@ export default function LabsScreen() {
 
       <FlatList
         data={labs}
-        renderItem={({ item }) => <LabItem item={item} />}
+        renderItem={({ item }) => <LabItem item={item} onDelete={handleDeleteLab} />}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -380,5 +396,20 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     color: COLORS.textMuted,
+  },
+  deleteBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+  deleteBadgeText: {
+    color: '#ef4444',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });

@@ -30,6 +30,8 @@ export default function FocusTimer() {
   const [running, setRunning] = useState(false);
   const [phase, setPhase] = useState('work'); // 'work' | 'break'
   const [autoBreak, setAutoBreak] = useState(true);
+  const [autoResume, setAutoResume] = useState(true);
+  const [targetSessions, setTargetSessions] = useState(4);
   const [sessionCount, setSessionCount] = useState(0);
   const [stats, setStats] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -79,7 +81,8 @@ export default function FocusTimer() {
       : (phase === 'work' ? workMinutes : breakMinutes);
 
     if (phase === 'work' && mins > 0) {
-      setSessionCount((c) => c + 1);
+      const currentCount = sessionCount + 1;
+      setSessionCount(currentCount);
       notify(`🍅 Focus session done! ${mins} min of ${topic}`);
       // Save session
       setSaving(true);
@@ -95,21 +98,27 @@ export default function FocusTimer() {
       } catch (_) {}
       setSaving(false);
 
-      if (autoBreak && mode !== 'stopwatch') {
+      if (autoBreak && mode !== 'stopwatch' && currentCount < targetSessions) {
         setPhase('break');
         setSeconds(breakMinutes * 60);
         setRunning(true);
       } else {
         setPhase('work');
         setSeconds(getTotalSeconds());
+        if (currentCount >= targetSessions) {
+          notify(`🎉 All ${targetSessions} sessions completed! Great job!`);
+        }
       }
     } else if (phase === 'break') {
       notify('☕ Break over! Time to focus.');
       setPhase('work');
       setSeconds(workMinutes * 60);
+      if (autoResume && sessionCount < targetSessions) {
+        setRunning(true);
+      }
     }
     elapsedSeconds.current = 0;
-  }, [mode, phase, workMinutes, breakMinutes, topic, autoBreak, notify, getTotalSeconds]);
+  }, [mode, phase, workMinutes, breakMinutes, topic, autoBreak, autoResume, notify, getTotalSeconds, sessionCount, targetSessions]);
 
   useEffect(() => {
     if (running) {
@@ -244,11 +253,13 @@ export default function FocusTimer() {
           </div>
 
           {/* Session counter */}
-          <div className="timer-session-dots">
-            {[1,2,3,4].map((i) => (
-              <div key={i} className={`session-dot ${sessionCount >= i ? 'filled' : ''}`} />
-            ))}
-            <span className="timer-session-label">{sessionCount} sessions today</span>
+          <div className="timer-session-dots" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+              {Array.from({ length: targetSessions }).map((_, i) => (
+                <div key={i} className={`session-dot ${sessionCount > i ? 'filled' : ''}`} />
+              ))}
+            </div>
+            <span className="timer-session-label">{sessionCount} of {targetSessions} sessions completed</span>
           </div>
         </div>
 
@@ -282,9 +293,21 @@ export default function FocusTimer() {
                     <button onClick={() => setBreakMinutes((v) => Math.min(30, v + 1))}><HiOutlineChevronUp /></button>
                   </div>
                 </div>
+                <div className="form-group" style={{ marginBottom: 12 }}>
+                  <label className="form-label">Target Sessions</label>
+                  <div className="timer-num-input">
+                    <button onClick={() => setTargetSessions((v) => Math.max(1, v - 1))}><HiOutlineChevronDown /></button>
+                    <span>{targetSessions}</span>
+                    <button onClick={() => setTargetSessions((v) => Math.min(10, v + 1))}><HiOutlineChevronUp /></button>
+                  </div>
+                </div>
                 <label className="timer-toggle-row">
                   <input type="checkbox" checked={autoBreak} onChange={(e) => setAutoBreak(e.target.checked)} id="timer-autobreak" />
                   <span>Auto-start breaks</span>
+                </label>
+                <label className="timer-toggle-row" style={{ marginTop: 8 }}>
+                  <input type="checkbox" checked={autoResume} onChange={(e) => setAutoResume(e.target.checked)} id="timer-autoresume" />
+                  <span>Auto-resume work after break</span>
                 </label>
               </>
             )}

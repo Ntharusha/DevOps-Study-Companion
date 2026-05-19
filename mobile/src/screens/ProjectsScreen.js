@@ -12,13 +12,18 @@ import {
   ScrollView,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
-import { getProjects, addProjectTime, createProject } from '../api';
+import { getProjects, addProjectTime, createProject, deleteProject } from '../api';
 
-const ProjectItem = ({ item, onAddTime }) => (
+const ProjectItem = ({ item, onAddTime, onDelete }) => (
   <View style={styles.card}>
     <View style={styles.header}>
       <Text style={styles.status}>{item.status}</Text>
-      <Text style={styles.time}>{item.timeSpent}h spent</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Text style={styles.time}>{item.timeSpent}h spent</Text>
+        <TouchableOpacity onPress={() => onDelete(item._id)} style={styles.deleteBadge}>
+          <Text style={styles.deleteBadgeText}>✕</Text>
+        </TouchableOpacity>
+      </View>
     </View>
     <Text style={styles.name}>{item.name}</Text>
     <Text style={styles.desc} numberOfLines={2}>{item.description}</Text>
@@ -92,6 +97,17 @@ export default function ProjectsScreen() {
     }
   };
 
+  const handleDeleteProject = async (id) => {
+    try {
+      const { data } = await deleteProject(id);
+      if (data.success) {
+        setProjects(prev => prev.filter(p => p._id !== id));
+      }
+    } catch (error) {
+      alert('Failed to delete project');
+    }
+  };
+
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -115,7 +131,7 @@ export default function ProjectsScreen() {
 
       <FlatList
         data={projects}
-        renderItem={({ item }) => <ProjectItem item={item} onAddTime={handleAddTime} />}
+        renderItem={({ item }) => <ProjectItem item={item} onAddTime={handleAddTime} onDelete={handleDeleteProject} />}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -340,5 +356,20 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     color: COLORS.textMuted,
+  },
+  deleteBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+  deleteBadgeText: {
+    color: '#ef4444',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });

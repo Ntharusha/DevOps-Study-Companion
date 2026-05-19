@@ -36,20 +36,24 @@ export const signup = (userData) => api.post('/auth/register', userData);
 export const getStats = () => cachedGet('/entries/stats');
 export const getEntries = (params) => cachedGet('/entries', { params }, 'entries_' + JSON.stringify(params || {}));
 export const createEntry = (data) => api.post('/entries', data);
+export const deleteEntry = (id) => api.delete(`/entries/${id}`);
 
 export const getLabs = () => cachedGet('/labs');
 export const getLab = (id) => cachedGet(`/labs/${id}`, {}, `lab_${id}`);
 export const createLab = (data) => api.post('/labs', data);
 export const updateLab = (id, data) => api.put(`/labs/${id}`, data);
 export const addLabStep = (id, data) => api.post(`/labs/${id}/steps`, data);
+export const deleteLab = (id) => api.delete(`/labs/${id}`);
 
 export const getProjects = () => cachedGet('/projects');
 export const createProject = (data) => api.post('/projects', data);
 export const addProjectTime = (id, hours) => api.patch(`/projects/${id}/time`, { hours });
+export const deleteProject = (id) => api.delete(`/projects/${id}`);
 
 export const getMemoryItems = (params) => cachedGet('/memory', { params }, 'memory_' + JSON.stringify(params || {}));
 export const createMemoryItem = (data) => api.post('/memory', data);
 export const reviewMemoryItem = (id, strength) => api.patch(`/memory/${id}/review`, { strength });
+export const deleteMemoryItem = (id) => api.delete(`/memory/${id}`);
 
 export const getCommands = () => cachedGet('/commands');
 
