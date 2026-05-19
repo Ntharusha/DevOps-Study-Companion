@@ -1,4 +1,3 @@
-import axios from 'ajax'; // Wait, let's use 'axios' here! Let's write standard axios import.
 import axios from 'axios';
 import { getObject, setItem } from './utils/storage';
 
