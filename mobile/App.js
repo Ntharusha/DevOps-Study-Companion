@@ -17,6 +17,10 @@ import MemoryScreen from './src/screens/MemoryScreen';
 import CommandsScreen from './src/screens/CommandsScreen';
 import ReportsScreen from './src/screens/ReportsScreen';
 import MoreScreen from './src/screens/MoreScreen';
+import FocusTimerScreen from './src/screens/FocusTimerScreen';
+import HabitsScreen from './src/screens/HabitsScreen';
+import GoalsScreen from './src/screens/GoalsScreen';
+import StudyPlantScreen from './src/screens/StudyPlantScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -35,6 +39,10 @@ function ToolsStack() {
       <Stack.Screen name="Memory" component={MemoryScreen} />
       <Stack.Screen name="Commands" component={CommandsScreen} />
       <Stack.Screen name="Reports" component={ReportsScreen} />
+      <Stack.Screen name="FocusTimer" component={FocusTimerScreen} options={{ title: 'Focus Timer' }} />
+      <Stack.Screen name="Habits" component={HabitsScreen} options={{ title: 'Habits Tracker' }} />
+      <Stack.Screen name="Goals" component={GoalsScreen} options={{ title: 'Weekly Goals' }} />
+      <Stack.Screen name="StudyPlant" component={StudyPlantScreen} options={{ title: 'Study Plant' }} />
     </Stack.Navigator>
   );
 }

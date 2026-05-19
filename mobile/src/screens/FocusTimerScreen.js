@@ -1,0 +1,275 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
+import { COLORS, SPACING, RADIUS } from '../theme';
+import { saveTimerSession, getTimerStats } from '../api';
+
+const TOPICS = ['Docker', 'Kubernetes', 'AWS', 'Linux', 'Git', 'CI/CD', 'Ansible', 'Terraform', 'Other'];
+
+export default function FocusTimerScreen() {
+  const [mode, setMode] = useState('pomodoro'); // pomodoro, stopwatch, countdown
+  const [phase, setPhase] = useState('work'); // work, break
+  const [isActive, setIsActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [customWorkMin, setCustomWorkMin] = useState('25');
+  const [customBreakMin, setCustomBreakMin] = useState('5');
+  const [selectedTopic, setSelectedTopic] = useState('Kubernetes');
+  const [stats, setStats] = useState({ totalSessions: 0, totalHours: 0 });
+  const [loading, setLoading] = useState(false);
+
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const { data } = await getTimerStats();
+      if (data.success) {
+        setStats(data.data);
+      }
+    } catch (err) {
+      console.log('Error fetching timer stats:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isActive) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (mode === 'stopwatch') {
+            return prev + 1;
+          }
+          if (prev <= 1) {
+            handleSessionComplete();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isActive, mode, phase]);
+
+  const handleSessionComplete = async () => {
+    setIsActive(false);
+    clearInterval(timerRef.current);
+
+    let durationMinutes = 0;
+    if (mode === 'pomodoro') {
+      durationMinutes = phase === 'work' ? parseInt(customWorkMin) : parseInt(customBreakMin);
+    } else if (mode === 'countdown') {
+      durationMinutes = parseInt(customWorkMin);
+    }
+
+    if (mode === 'pomodoro' && phase === 'work') {
+      alert('Focus session complete! Take a break. 🍅');
+    } else if (mode === 'countdown') {
+      alert('Countdown complete! ⏰');
+    }
+
+    try {
+      setLoading(true);
+      await saveTimerSession({
+        mode,
+        durationMinutes,
+        topic: selectedTopic,
+        phase,
+      });
+      fetchStats();
+    } catch (err) {
+      console.log('Error saving session:', err);
+    } finally {
+      setLoading(false);
+    }
+
+    // Toggle Phase for Pomodoro
+    if (mode === 'pomodoro') {
+      if (phase === 'work') {
+        setPhase('break');
+        setTimeLeft(parseInt(customBreakMin) * 60);
+      } else {
+        setPhase('work');
+        setTimeLeft(parseInt(customWorkMin) * 60);
+      }
+    } else {
+      resetTimer();
+    }
+  };
+
+  const handleStartPause = () => {
+    setIsActive(!isActive);
+  };
+
+  const resetTimer = () => {
+    setIsActive(false);
+    clearInterval(timerRef.current);
+    if (mode === 'pomodoro') {
+      setTimeLeft((phase === 'work' ? parseInt(customWorkMin) : parseInt(customBreakMin)) * 60);
+    } else if (mode === 'countdown') {
+      setTimeLeft(parseInt(customWorkMin) * 60);
+    } else {
+      setTimeLeft(0);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    setIsActive(false);
+    clearInterval(timerRef.current);
+    if (newMode === 'pomodoro') {
+      setPhase('work');
+      setTimeLeft(parseInt(customWorkMin) * 60);
+    } else if (newMode === 'countdown') {
+      setTimeLeft(parseInt(customWorkMin) * 60);
+    } else {
+      setTimeLeft(0);
+    }
+  };
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.modeTabs}>
+        {['pomodoro', 'stopwatch', 'countdown'].map((m) => (
+          <TouchableOpacity
+            key={m}
+            style={[styles.modeTab, mode === m && styles.activeTab]}
+            onPress={() => handleModeChange(m)}
+          >
+            <Text style={[styles.tabText, mode === m && styles.activeTabText]}>
+              {m.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.timerCard}>
+        {mode === 'pomodoro' && (
+          <View style={[styles.badge, phase === 'work' ? styles.workBadge : styles.breakBadge]}>
+            <Text style={styles.badgeText}>{phase.toUpperCase()}</Text>
+          </View>
+        )}
+        <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+
+        <View style={styles.controls}>
+          <TouchableOpacity style={styles.btnPlay} onPress={handleStartPause}>
+            <Text style={styles.btnPlayText}>{isActive ? '⏸ PAUSE' : '▶ START'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnReset} onPress={resetTimer}>
+            <Text style={styles.btnResetText}>🔄 RESET</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Session Settings</Text>
+
+        <Text style={styles.label}>DevOps Topic</Text>
+        <View style={styles.topicsGrid}>
+          {TOPICS.map((t) => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.topicChip, selectedTopic === t && styles.activeTopicChip]}
+              onPress={() => setSelectedTopic(t)}
+            >
+              <Text style={[styles.topicChipText, selectedTopic === t && styles.activeTopicText]}>
+                {t}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {mode !== 'stopwatch' && (
+          <View style={styles.rowInputs}>
+            <View style={{ flex: 1, marginRight: 10 }}>
+              <Text style={styles.label}>Work (Min)</Text>
+              <TextInput
+                style={styles.input}
+                keyboardType="numeric"
+                value={customWorkMin}
+                onChangeText={(text) => {
+                  setCustomWorkMin(text);
+                  if (!isActive) setTimeLeft(parseInt(text || '0') * 60);
+                }}
+              />
+            </View>
+            {mode === 'pomodoro' && (
+              <View style={{ flex: 1 }}>
+                <Text style={styles.label}>Break (Min)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={customBreakMin}
+                  onChangeText={(text) => {
+                    setCustomBreakMin(text);
+                  }}
+                />
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+
+      <View style={styles.statsCard}>
+        <View style={styles.statCol}>
+          <Text style={styles.statVal}>{stats.totalSessions || 0}</Text>
+          <Text style={styles.statLbl}>Sessions</Text>
+        </View>
+        <View style={styles.statCol}>
+          <Text style={styles.statVal}>{(stats.totalHours || 0).toFixed(1)}h</Text>
+          <Text style={styles.statLbl}>Hours</Text>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.background, padding: SPACING.md },
+  modeTabs: { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: RADIUS.md, padding: 4, marginBottom: SPACING.lg },
+  modeTab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: RADIUS.sm },
+  activeTab: { backgroundColor: COLORS.primary },
+  tabText: { color: COLORS.textMuted, fontWeight: '700', fontSize: 12 },
+  activeTabText: { color: '#fff' },
+  timerCard: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
+  timerText: { fontSize: 64, fontWeight: '800', color: COLORS.text, fontFamily: 'monospace', marginVertical: SPACING.md },
+  badge: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
+  workBadge: { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderWidth: 1, borderColor: COLORS.primary },
+  breakBadge: { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 1, borderColor: COLORS.success },
+  badgeText: { color: COLORS.text, fontWeight: '800', fontSize: 12 },
+  controls: { flexDirection: 'row', gap: 16, marginTop: SPACING.md },
+  btnPlay: { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: RADIUS.md },
+  btnPlayText: { color: '#fff', fontWeight: '800' },
+  btnReset: { backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border },
+  btnResetText: { color: COLORS.text, fontWeight: '700' },
+  card: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
+  cardTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800', marginBottom: SPACING.md },
+  label: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' },
+  topicsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.md },
+  topicChip: { backgroundColor: COLORS.background, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border },
+  activeTopicChip: { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderColor: COLORS.primary },
+  topicChipText: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '600' },
+  activeTopicText: { color: COLORS.text, fontWeight: '800' },
+  rowInputs: { flexDirection: 'row', marginTop: SPACING.sm },
+  input: { backgroundColor: COLORS.background, color: COLORS.text, padding: 12, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, fontSize: 16, fontWeight: '700', textAlign: 'center' },
+  statsCard: { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: 40 },
+  statCol: { flex: 1, alignItems: 'center' },
+  statVal: { color: COLORS.text, fontSize: 28, fontWeight: '800' },
+  statLbl: { color: COLORS.textMuted, fontSize: 12, marginTop: 4 },
+});
