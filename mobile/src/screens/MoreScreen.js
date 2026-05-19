@@ -62,6 +62,34 @@ export default function MoreScreen({ navigation }) {
       </View>
 
       <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Study Tools</Text>
+        <MenuItem 
+          title="Focus Timer" 
+          subtitle="Pomodoro focus sessions" 
+          icon="⏱️" 
+          onPress={() => navigation.navigate('FocusTimer')} 
+        />
+        <MenuItem 
+          title="Habits Tracker" 
+          subtitle="Build consistency daily" 
+          icon="📅" 
+          onPress={() => navigation.navigate('Habits')} 
+        />
+        <MenuItem 
+          title="Study Goals" 
+          subtitle="Hours target vs actual progress" 
+          icon="🎯" 
+          onPress={() => navigation.navigate('Goals')} 
+        />
+        <MenuItem 
+          title="Study Plant" 
+          subtitle="Gamified study partner growth" 
+          icon="🌱" 
+          onPress={() => navigation.navigate('StudyPlant')} 
+        />
+      </View>
+
+      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Coming Soon</Text>
         <MenuItem 
           title="Mock Interviews" 
