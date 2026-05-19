@@ -14,19 +14,31 @@ import {
 import { COLORS, SPACING, RADIUS } from '../theme';
 import { getEntries, createEntry } from '../api';
 
+const ENTRY_TOPICS = [
+  'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
+  'Ansible', 'Git', 'Networking', 'Monitoring', 'Security',
+  'Scripting', 'Nginx', 'Jenkins', 'Other'
+];
+
+const DIFFICULTIES = ['Easy', 'Medium', 'Hard', 'Expert'];
+
 const EntryItem = ({ item }) => (
   <View style={styles.entryCard}>
     <View style={styles.entryHeader}>
       <Text style={styles.entryDate}>{new Date(item.date).toLocaleDateString()}</Text>
-      <View style={[styles.tag, { backgroundColor: item.type === 'learning' ? COLORS.primary : COLORS.secondary }]}>
-        <Text style={styles.tagText}>{item.type}</Text>
+      <View style={[styles.tag, { 
+        backgroundColor: item.difficulty === 'Expert' ? '#ef4444' : 
+                         item.difficulty === 'Hard' ? '#f97316' : 
+                         item.difficulty === 'Medium' ? COLORS.primary : COLORS.success 
+      }]}>
+        <Text style={styles.tagText}>{item.difficulty}</Text>
       </View>
     </View>
-    <Text style={styles.entryTitle}>{item.title}</Text>
-    <Text style={styles.entryDesc} numberOfLines={2}>{item.description}</Text>
+    <Text style={styles.entryTopic}># {item.topic}</Text>
+    <Text style={styles.entryDesc}>{item.description}</Text>
+    {item.notes ? <Text style={styles.entryNotes} numberOfLines={2}>Notes: {item.notes}</Text> : null}
     <View style={styles.entryFooter}>
-      <Text style={styles.entryTopic}># {item.topic}</Text>
-      <Text style={styles.entryDuration}>{item.duration} hours</Text>
+      <Text style={styles.entryDuration}>⏱️ {item.timeSpent} hours</Text>
     </View>
   </View>
 );
@@ -37,11 +49,12 @@ export default function EntriesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({
-    title: '',
+    date: new Date().toISOString().split('T')[0],
+    topic: 'Docker',
     description: '',
-    topic: '',
-    duration: '',
-    type: 'learning',
+    timeSpent: '1',
+    difficulty: 'Medium',
+    notes: '',
   });
 
   const fetchEntries = async () => {
@@ -57,14 +70,30 @@ export default function EntriesScreen() {
   };
 
   const handleCreate = async () => {
-    if (!form.title || !form.duration) return;
+    if (!form.topic || !form.description || !form.timeSpent || !form.difficulty) {
+      alert('Please fill in all required fields');
+      return;
+    }
     try {
-      const { data } = await createEntry(form);
-      setEntries([data.data, ...entries]);
-      setShowModal(false);
-      setForm({ title: '', description: '', topic: '', duration: '', type: 'learning' });
+      const payload = {
+        ...form,
+        timeSpent: parseFloat(form.timeSpent) || 0
+      };
+      const { data } = await createEntry(payload);
+      if (data.success) {
+        setEntries([data.data, ...entries]);
+        setShowModal(false);
+        setForm({
+          date: new Date().toISOString().split('T')[0],
+          topic: 'Docker',
+          description: '',
+          timeSpent: '1',
+          difficulty: 'Medium',
+          notes: '',
+        });
+      }
     } catch (error) {
-      alert('Failed to create entry');
+      alert(error.response?.data?.message || 'Failed to create entry');
     }
   };
 
@@ -99,7 +128,7 @@ export default function EntriesScreen() {
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>No entries found</Text>
+            <Text style={styles.emptyText}>No entries logged yet</Text>
           </View>
         }
       />
@@ -107,31 +136,63 @@ export default function EntriesScreen() {
       <Modal visible={showModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Entry</Text>
+            <Text style={styles.modalTitle}>Log Daily Work</Text>
             <ScrollView>
-              <Text style={styles.label}>Title</Text>
-              <TextInput style={styles.input} value={form.title} onChangeText={t => setForm({...form, title: t})} placeholder="What did you do?" placeholderTextColor={COLORS.textMuted} />
-              
               <Text style={styles.label}>Topic</Text>
-              <TextInput style={styles.input} value={form.topic} onChangeText={t => setForm({...form, topic: t})} placeholder="e.g. Docker, AWS, K8s" placeholderTextColor={COLORS.textMuted} />
-              
-              <Text style={styles.label}>Duration (hours)</Text>
-              <TextInput style={styles.input} value={form.duration} onChangeText={t => setForm({...form, duration: t})} placeholder="e.g. 2.5" keyboardType="numeric" placeholderTextColor={COLORS.textMuted} />
-              
-              <Text style={styles.label}>Description</Text>
-              <TextInput style={[styles.input, {height: 80}]} value={form.description} onChangeText={t => setForm({...form, description: t})} multiline placeholder="Details..." placeholderTextColor={COLORS.textMuted} />
-              
-              <View style={styles.typeRow}>
-                {['learning', 'working'].map(type => (
+              <View style={styles.topicGrid}>
+                {ENTRY_TOPICS.map(t => (
                   <TouchableOpacity 
-                    key={type} 
-                    style={[styles.typeBtn, form.type === type && styles.typeBtnActive]}
-                    onPress={() => setForm({...form, type})}
+                    key={t} 
+                    style={[styles.topicChip, form.topic === t && styles.topicChipActive]}
+                    onPress={() => setForm({...form, topic: t})}
                   >
-                    <Text style={[styles.typeBtnText, form.type === type && styles.typeBtnTextActive]}>{type}</Text>
+                    <Text style={[styles.topicChipText, form.topic === t && styles.topicChipTextActive]}>{t}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
+
+              <Text style={styles.label}>Time Spent (hours)</Text>
+              <TextInput 
+                style={styles.input} 
+                value={form.timeSpent} 
+                onChangeText={t => setForm({...form, timeSpent: t})} 
+                placeholder="e.g. 2.5" 
+                keyboardType="numeric" 
+                placeholderTextColor={COLORS.textMuted} 
+              />
+
+              <Text style={styles.label}>Difficulty</Text>
+              <View style={styles.difficultyRow}>
+                {DIFFICULTIES.map(d => (
+                  <TouchableOpacity 
+                    key={d} 
+                    style={[styles.diffBtn, form.difficulty === d && styles.diffBtnActive]}
+                    onPress={() => setForm({...form, difficulty: d})}
+                  >
+                    <Text style={[styles.diffBtnText, form.difficulty === d && styles.diffBtnTextActive]}>{d}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.label}>What did you learn/do?</Text>
+              <TextInput 
+                style={[styles.input, {height: 80}]} 
+                value={form.description} 
+                onChangeText={t => setForm({...form, description: t})} 
+                multiline 
+                placeholder="Describe your activities..." 
+                placeholderTextColor={COLORS.textMuted} 
+              />
+
+              <Text style={styles.label}>Additional Notes (optional)</Text>
+              <TextInput 
+                style={[styles.input, {height: 60}]} 
+                value={form.notes} 
+                onChangeText={t => setForm({...form, notes: t})} 
+                multiline 
+                placeholder="Any links, issues, observations..." 
+                placeholderTextColor={COLORS.textMuted} 
+              />
             </ScrollView>
 
             <View style={styles.modalActions}>
@@ -199,7 +260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   entryDate: {
     color: COLORS.textMuted,
@@ -216,16 +277,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
   },
-  entryTitle: {
-    color: COLORS.text,
-    fontSize: 18,
+  entryTopic: {
+    color: COLORS.primary,
+    fontSize: 14,
     fontWeight: '700',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   entryDesc: {
-    color: COLORS.textMuted,
+    color: COLORS.text,
     fontSize: 14,
-    marginBottom: SPACING.md,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  entryNotes: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    fontStyle: 'italic',
+    backgroundColor: COLORS.background,
+    padding: 8,
+    borderRadius: RADIUS.sm,
+    marginBottom: 10,
   },
   entryFooter: {
     flexDirection: 'row',
@@ -233,11 +304,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     paddingTop: SPACING.sm,
-  },
-  entryTopic: {
-    color: COLORS.primary,
-    fontSize: 12,
-    fontWeight: '600',
+    marginTop: 4,
   },
   entryDuration: {
     color: COLORS.text,
@@ -284,29 +351,59 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  typeRow: {
+  topicGrid: {
     flexDirection: 'row',
-    gap: 10,
-    marginTop: 16,
+    flexWrap: 'wrap',
+    gap: 6,
+    marginVertical: 4,
   },
-  typeBtn: {
+  topicChip: {
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  topicChipActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+  },
+  topicChipText: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  topicChipTextActive: {
+    color: COLORS.text,
+    fontWeight: '800',
+  },
+  difficultyRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginVertical: 4,
+  },
+  diffBtn: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 8,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
     alignItems: 'center',
+    backgroundColor: COLORS.background,
   },
-  typeBtnActive: {
+  diffBtnActive: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   },
-  typeBtnText: {
+  diffBtnText: {
     color: COLORS.textMuted,
+    fontSize: 12,
     fontWeight: '600',
   },
-  typeBtnTextActive: {
+  diffBtnTextActive: {
     color: '#fff',
+    fontWeight: '800',
   },
   modalActions: {
     marginTop: 24,

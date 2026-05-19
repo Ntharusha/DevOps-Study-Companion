@@ -135,7 +135,7 @@ export default function ProjectsScreen() {
               <TextInput style={[styles.input, {height: 80}]} value={form.description} onChangeText={t => setForm({...form, description: t})} multiline placeholder="Project details..." placeholderTextColor={COLORS.textMuted} />
               
               <View style={styles.statusRow}>
-                {['planning', 'active', 'completed'].map(status => (
+                {['planning', 'in-progress', 'completed'].map(status => (
                   <TouchableOpacity 
                     key={status} 
                     style={[styles.statusBtn, form.status === status && styles.statusBtnActive]}

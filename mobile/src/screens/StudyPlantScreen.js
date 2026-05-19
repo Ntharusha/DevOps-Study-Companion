@@ -75,6 +75,17 @@ export default function StudyPlantScreen() {
     );
   }
 
+  if (!stats) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: COLORS.text }}>Failed to load plant data.</Text>
+        <TouchableOpacity onPress={fetchData} style={{ marginTop: 20 }}>
+          <Text style={{ color: COLORS.primary }}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   const { totalXP, plantLevel } = stats;
   const nextXP = plantLevel.next;
   const currentLevelXP = ROADMAP.find(r => r.level === plantLevel.level - 1)?.level * 100 || 0; // dummy start

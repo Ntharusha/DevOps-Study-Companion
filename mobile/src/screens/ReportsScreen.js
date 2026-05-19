@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
 import { getStats } from '../api';
