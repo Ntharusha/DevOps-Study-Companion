@@ -20,6 +20,9 @@ app.use('/api/commands', require('./routes/commands'));
 app.use('/api/errors', require('./routes/errors'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/interview', require('./routes/interview'));
+app.use('/api/habits', require('./routes/habits'));
+app.use('/api/goals', require('./routes/goals'));
+app.use('/api/timer', require('./routes/timer'));
 
 // Health check
 app.get('/api/health', (req, res) => {
