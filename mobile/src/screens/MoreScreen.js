@@ -21,7 +21,7 @@ const MenuItem = ({ title, icon, subtitle, onPress }) => (
   </TouchableOpacity>
 );
 
-export default function MoreScreen({ navigation }) {
+export default function MoreScreen({ navigation, onLogout }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -96,6 +96,16 @@ export default function MoreScreen({ navigation }) {
           subtitle="Practice DevOps questions" 
           icon="🎤" 
           onPress={() => alert('Coming soon!')} 
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Account</Text>
+        <MenuItem 
+          title="Sign Out" 
+          subtitle="Log out of your account" 
+          icon="🚪" 
+          onPress={onLogout} 
         />
       </View>
 

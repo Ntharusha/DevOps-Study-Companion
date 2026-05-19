@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, ActivityIndicator, Text } from 'react-native';
 
 import { COLORS } from './src/theme';
+import { getObject, setItem, removeItem, StorageKeys } from './src/utils/storage';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
@@ -25,16 +26,17 @@ import StudyPlantScreen from './src/screens/StudyPlantScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-
 // Sub-stacks for screens accessible from "More"
-function ToolsStack() {
+function ToolsStack({ onLogout }) {
   return (
     <Stack.Navigator screenOptions={{ 
       headerStyle: { backgroundColor: COLORS.card },
       headerTintColor: COLORS.text,
       headerTitleStyle: { fontWeight: '800' }
     }}>
-      <Stack.Screen name="Menu" component={MoreScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Menu" options={{ headerShown: false }}>
+        {(props) => <MoreScreen {...props} onLogout={onLogout} />}
+      </Stack.Screen>
       <Stack.Screen name="Projects" component={ProjectsScreen} />
       <Stack.Screen name="Memory" component={MemoryScreen} />
       <Stack.Screen name="Commands" component={CommandsScreen} />
@@ -47,7 +49,7 @@ function ToolsStack() {
   );
 }
 
-function TabNavigator() {
+function TabNavigator({ onLogout }) {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -88,12 +90,13 @@ function TabNavigator() {
       />
       <Tab.Screen
         name="More"
-        component={ToolsStack}
         options={{
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 24, color }}>➕</Text>,
           headerShown: false
         }}
-      />
+      >
+        {(props) => <ToolsStack {...props} onLogout={onLogout} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -103,9 +106,28 @@ export default function App() {
   const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    // Check for saved user session here if needed
+    // Check for saved user session on app start
+    const savedUser = getObject(StorageKeys.USER_SESSION);
+    if (savedUser) {
+      setUser(savedUser);
+    }
     setInitializing(false);
   }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setItem(StorageKeys.USER_SESSION, userData);
+  };
+
+  const handleSignup = (userData) => {
+    setUser(userData);
+    setItem(StorageKeys.USER_SESSION, userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    removeItem(StorageKeys.USER_SESSION);
+  };
 
   if (initializing) {
     return (
@@ -122,14 +144,16 @@ export default function App() {
         {!user ? (
           <>
             <Stack.Screen name="Login">
-              {(props) => <LoginScreen {...props} onLogin={setUser} />}
+              {(props) => <LoginScreen {...props} onLogin={handleLogin} />}
             </Stack.Screen>
             <Stack.Screen name="Signup">
-              {(props) => <SignupScreen {...props} onSignup={setUser} />}
+              {(props) => <SignupScreen {...props} onSignup={handleSignup} />}
             </Stack.Screen>
           </>
         ) : (
-          <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen name="Main">
+            {(props) => <TabNavigator {...props} onLogout={handleLogout} />}
+          </Stack.Screen>
         )}
       </Stack.Navigator>
     </NavigationContainer>
