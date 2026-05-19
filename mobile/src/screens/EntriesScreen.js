@@ -193,16 +193,16 @@ export default function EntriesScreen() {
                 placeholder="Any links, issues, observations..." 
                 placeholderTextColor={COLORS.textMuted} 
               />
-            </ScrollView>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
-                <Text style={styles.saveBtnText}>Save Entry</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
+                  <Text style={styles.saveBtnText}>Save Entry</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>

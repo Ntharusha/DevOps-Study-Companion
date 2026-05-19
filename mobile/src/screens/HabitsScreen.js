@@ -182,67 +182,69 @@ export default function HabitsScreen() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>New Habit</Text>
 
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Habit name (e.g. Code Kubernetes daily)"
-              placeholderTextColor={COLORS.textMuted}
-              value={name}
-              onChangeText={setName}
-            />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Habit name (e.g. Code Kubernetes daily)"
+                placeholderTextColor={COLORS.textMuted}
+                value={name}
+                onChangeText={setName}
+              />
 
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Short Description"
-              placeholderTextColor={COLORS.textMuted}
-              value={description}
-              onChangeText={setDescription}
-            />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Short Description"
+                placeholderTextColor={COLORS.textMuted}
+                value={description}
+                onChangeText={setDescription}
+              />
 
-            <Text style={styles.modalLabel}>Category</Text>
-            <View style={styles.catGrid}>
-              {CATEGORIES.map(c => (
-                <TouchableOpacity
-                  key={c}
-                  style={[styles.catChip, category === c && styles.activeCatChip]}
-                  onPress={() => setCategory(c)}
-                >
-                  <Text style={styles.catChipText}>{c}</Text>
+              <Text style={styles.modalLabel}>Category</Text>
+              <View style={styles.catGrid}>
+                {CATEGORIES.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[styles.catChip, category === c && styles.activeCatChip]}
+                    onPress={() => setCategory(c)}
+                  >
+                    <Text style={styles.catChipText}>{c}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.modalLabel}>Icon</Text>
+              <View style={styles.emojiGrid}>
+                {EMOJIS.map(e => (
+                  <TouchableOpacity
+                    key={e}
+                    style={[styles.emojiChip, selectedIcon === e && styles.activeEmojiChip]}
+                    onPress={() => setSelectedIcon(e)}
+                  >
+                    <Text style={{ fontSize: 20 }}>{e}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.modalLabel}>Color</Text>
+              <View style={styles.colorGrid}>
+                {ACCENT_COLORS.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[styles.colorChip, { backgroundColor: c }, selectedColor === c && styles.activeColorChip]}
+                    onPress={() => setSelectedColor(c)}
+                  />
+                ))}
+              </View>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.modalCancel} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.cancelText}>CANCEL</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.modalLabel}>Icon</Text>
-            <View style={styles.emojiGrid}>
-              {EMOJIS.map(e => (
-                <TouchableOpacity
-                  key={e}
-                  style={[styles.emojiChip, selectedIcon === e && styles.activeEmojiChip]}
-                  onPress={() => setSelectedIcon(e)}
-                >
-                  <Text style={{ fontSize: 20 }}>{e}</Text>
+                <TouchableOpacity style={styles.modalSubmit} onPress={handleCreateHabit}>
+                  <Text style={styles.submitText}>CREATE</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.modalLabel}>Color</Text>
-            <View style={styles.colorGrid}>
-              {ACCENT_COLORS.map(c => (
-                <TouchableOpacity
-                  key={c}
-                  style={[styles.colorChip, { backgroundColor: c }, selectedColor === c && styles.activeColorChip]}
-                  onPress={() => setSelectedColor(c)}
-                />
-              ))}
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.modalCancel} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelText}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalSubmit} onPress={handleCreateHabit}>
-                <Text style={styles.submitText}>CREATE</Text>
-              </TouchableOpacity>
-            </View>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -273,7 +275,7 @@ const styles = StyleSheet.create({
   btnDelete: { padding: 4 },
   btnDeleteText: { color: '#ef4444', fontSize: 11, fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: SPACING.lg },
-  modalContent: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
+  modalContent: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, maxHeight: '85%' },
   modalTitle: { color: COLORS.text, fontSize: 20, fontWeight: '800', marginBottom: SPACING.md },
   modalInput: { backgroundColor: COLORS.background, color: COLORS.text, padding: 12, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.md },
   modalLabel: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' },

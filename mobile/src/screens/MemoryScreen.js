@@ -73,7 +73,14 @@ export default function MemoryScreen() {
   };
 
   const handleCreate = async () => {
-    if (!form.concept || !form.explanation) return;
+    if (!form.concept) {
+      alert('Concept/Question is required');
+      return;
+    }
+    if (!form.explanation) {
+      alert('Explanation/Answer is required');
+      return;
+    }
     try {
       const { data } = await createMemoryItem(form);
       setItems([data.data, ...items]);
@@ -142,16 +149,15 @@ export default function MemoryScreen() {
               
               <Text style={styles.label}>Explanation / Answer</Text>
               <TextInput style={[styles.input, {height: 120}]} value={form.explanation} onChangeText={t => setForm({...form, explanation: t})} multiline placeholder="Full explanation..." placeholderTextColor={COLORS.textMuted} />
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
+                  <Text style={styles.saveBtnText}>Save to Bank</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
-                <Text style={styles.saveBtnText}>Save to Bank</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </Modal>

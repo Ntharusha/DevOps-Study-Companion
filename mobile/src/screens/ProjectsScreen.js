@@ -65,7 +65,10 @@ export default function ProjectsScreen() {
   };
 
   const handleCreate = async () => {
-    if (!form.name) return;
+    if (!form.name) {
+      alert('Project name is required');
+      return;
+    }
     try {
       const payload = {
         ...form,
@@ -145,16 +148,15 @@ export default function ProjectsScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
+                  <Text style={styles.saveBtnText}>Create Project</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}>
-                <Text style={styles.saveBtnText}>Create Project</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
-                <Text style={styles.cancelBtnText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </Modal>

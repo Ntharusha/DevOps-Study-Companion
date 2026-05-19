@@ -88,8 +88,20 @@ export default function StudyPlantScreen() {
 
   const { totalXP, plantLevel } = stats;
   const nextXP = plantLevel.next;
-  const currentLevelXP = ROADMAP.find(r => r.level === plantLevel.level - 1)?.level * 100 || 0; // dummy start
-  const progressPct = nextXP ? Math.min(Math.round(((totalXP - currentLevelXP) / (nextXP - currentLevelXP)) * 100), 100) : 100;
+
+  const getXPThreshold = (lvl) => {
+    if (lvl <= 1) return 0;
+    if (lvl === 2) return 50;
+    if (lvl === 3) return 150;
+    if (lvl === 4) return 300;
+    if (lvl === 5) return 500;
+    if (lvl === 6) return 800;
+    return 1200;
+  };
+
+  const currentLevelXP = getXPThreshold(plantLevel.level);
+  const nextLevelXP = nextXP || 1200;
+  const progressPct = nextXP ? Math.max(0, Math.min(Math.round(((totalXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100), 100)) : 100;
 
   return (
     <ScrollView
@@ -135,7 +147,7 @@ export default function StudyPlantScreen() {
         <Text style={styles.cardTitle}>Plant Evolution Roadmap</Text>
         <View style={styles.roadmapContainer}>
           {ROADMAP.map((r, i) => {
-            const reached = totalXP >= (ROADMAP[i-1]?.level * 100 || 0); // basic logic for display
+            const reached = totalXP >= getXPThreshold(r.level);
             const isCurrent = plantLevel.level === r.level;
             return (
               <View key={r.level} style={[styles.roadmapStep, reached && styles.reachedStep, isCurrent && styles.currentStep]}>

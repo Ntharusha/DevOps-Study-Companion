@@ -184,46 +184,48 @@ export default function GoalsScreen() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Set Study Goal</Text>
 
-            <Text style={styles.modalLabel}>Select DevOps Topic</Text>
-            <View style={styles.catGrid}>
-              {TOPICS.map(t => (
-                <TouchableOpacity
-                  key={t}
-                  style={[styles.catChip, selectedTopic === t && styles.activeCatChip]}
-                  onPress={() => setSelectedTopic(t)}
-                >
-                  <Text style={styles.catChipText}>{t}</Text>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={styles.modalLabel}>Select DevOps Topic</Text>
+              <View style={styles.catGrid}>
+                {TOPICS.map(t => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[styles.catChip, selectedTopic === t && styles.activeCatChip]}
+                    onPress={() => setSelectedTopic(t)}
+                  >
+                    <Text style={styles.catChipText}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.modalLabel}>Weekly Hours Target</Text>
+              <TextInput
+                style={styles.modalInput}
+                keyboardType="numeric"
+                value={targetHours}
+                onChangeText={setTargetHours}
+                placeholder="e.g. 10"
+                placeholderTextColor={COLORS.textMuted}
+              />
+
+              <Text style={styles.modalLabel}>Goals Notes / Resources</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="e.g. Focus on CKAD labs or read docs"
+                placeholderTextColor={COLORS.textMuted}
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.modalCancel} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.cancelText}>CANCEL</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-
-            <Text style={styles.modalLabel}>Weekly Hours Target</Text>
-            <TextInput
-              style={styles.modalInput}
-              keyboardType="numeric"
-              value={targetHours}
-              onChangeText={setTargetHours}
-              placeholder="e.g. 10"
-              placeholderTextColor={COLORS.textMuted}
-            />
-
-            <Text style={styles.modalLabel}>Goals Notes / Resources</Text>
-            <TextInput
-              style={styles.modalInput}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="e.g. Focus on CKAD labs or read docs"
-              placeholderTextColor={COLORS.textMuted}
-            />
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.modalCancel} onPress={() => setModalVisible(false)}>
-                <Text style={styles.cancelText}>CANCEL</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalSubmit} onPress={handleCreateGoal}>
-                <Text style={styles.submitText}>SET GOAL</Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity style={styles.modalSubmit} onPress={handleCreateGoal}>
+                  <Text style={styles.submitText}>SET GOAL</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -262,7 +264,7 @@ const styles = StyleSheet.create({
   goalPctText: { fontSize: 16, fontWeight: '800', marginLeft: 'auto' },
   goalNotes: { color: COLORS.textMuted, fontSize: 12, marginTop: 12, borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 8 },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: SPACING.lg },
-  modalContent: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border },
+  modalContent: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, maxHeight: '85%' },
   modalTitle: { color: COLORS.text, fontSize: 20, fontWeight: '800', marginBottom: SPACING.md },
   modalLabel: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.md },
