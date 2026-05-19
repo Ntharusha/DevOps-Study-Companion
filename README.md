@@ -96,10 +96,50 @@ To deploy the production infrastructure to AWS and MongoDB Atlas:
 
 ## 🎯 Application Features
 
+### 📚 Core DevOps Tracker
 - **Multi-Platform Access**: Track studies via the Web Dashboard or the Native Android app.
 - **Gamified Learning**: Level up, gain XP, and track streaks based on completed labs and projects.
 - **Knowledge Base**: Store commands, errors, and solutions in a structured memory bank.
 - **High-Performance Storage**: Mobile app utilizes C++ backed MMKV for instant local data persistence.
+
+### 🆕 Study Tools (StudiesTimer-Inspired Features)
+
+#### ⏱️ Focus Timer (`/timer`)
+- **Three Timer Modes**: Pomodoro 🍅, Stopwatch ⏱️, and Countdown ⏳
+- **Auto-Start Breaks**: Toggle automatic break transitions after each focus session
+- **Fully Customizable**: Set any work duration (5–120 min) and break duration (1–30 min)
+- **Topic Tagging**: Link every session to a DevOps topic (Docker, Kubernetes, AWS, etc.)
+- **XP System**: Earn XP for every completed session (Pomodoro sessions earn 1.5× XP)
+- **Session Counter**: Visual dot tracker for 4-Pomodoro cycle
+- **Desktop Notifications**: Browser notifications when sessions complete
+- **Live Stats Panel**: Total hours, weekly sessions, and all-time session count
+
+#### 📅 Habits Tracker (`/habits`)
+- **Weekly Grid View**: See all 7 days of the week at a glance for each habit
+- **One-Click Check-Off**: Mark today's habit complete directly from the grid
+- **Streak Tracking**: Current and longest streaks calculated automatically per habit
+- **Custom Icons & Colors**: Pick from 12 emoji icons and 8 color themes
+- **Categories**: Organize habits as Practice, Reading, Lab, Review, Project, or Other
+- **Target Days**: Set how many days/week each habit should be completed
+- **Summary Stats**: Today's completion rate and combined streak count
+
+#### 🎯 Study Goals (`/goals`)
+- **Weekly Hour Targets**: Set topic-specific hour goals for the current week
+- **Real-Time Progress**: Automatically reads actual study hours from your logged entries
+- **Animated Progress Bars**: Per-topic bars fill as you log study sessions
+- **Master Progress Card**: Overall weekly progress shown as a combined % with master bar
+- **Completion Celebration**: 🏆 banner when you hit 100% of your weekly goal
+- **Topic Color Coding**: Each DevOps topic gets its signature color
+- **Notes Support**: Add context or resource links to each goal
+
+#### 🌱 Study Plant (`/plant`)
+- **7 Growth Stages**: Seed → Sprout → Sapling → Bush → Young Tree → Tree → Ancient Tree
+- **XP-Based Leveling**: Plant grows as you accumulate XP from Focus Timer sessions
+- **Visual XP Bar**: Shows progress toward next plant level with animated fill
+- **Roadmap Display**: Visual emoji roadmap showing all levels and current position
+- **Click-to-Cheer**: Click your plant for a bounce animation with particle effects 🎉
+- **Topic Breakdown**: Bar chart showing which DevOps topics you've focused on most
+- **Session History**: Last 10 focus sessions with XP earned per session
 
 ---
 *Built as a portfolio piece to demonstrate full-stack development combined with modern cloud and DevOps engineering.*
