@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
-import { getEntries, createEntry } from '../api';
+import { getEntries, createEntry, deleteEntry } from '../api';
 
 const ENTRY_TOPICS = [
   'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
@@ -22,16 +22,21 @@ const ENTRY_TOPICS = [
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard', 'Expert'];
 
-const EntryItem = ({ item }) => (
+const EntryItem = ({ item, onDelete }) => (
   <View style={styles.entryCard}>
     <View style={styles.entryHeader}>
       <Text style={styles.entryDate}>{new Date(item.date).toLocaleDateString()}</Text>
-      <View style={[styles.tag, { 
-        backgroundColor: item.difficulty === 'Expert' ? '#ef4444' : 
-                         item.difficulty === 'Hard' ? '#f97316' : 
-                         item.difficulty === 'Medium' ? COLORS.primary : COLORS.success 
-      }]}>
-        <Text style={styles.tagText}>{item.difficulty}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={[styles.tag, { 
+          backgroundColor: item.difficulty === 'Expert' ? '#ef4444' : 
+                           item.difficulty === 'Hard' ? '#f97316' : 
+                           item.difficulty === 'Medium' ? COLORS.primary : COLORS.success 
+        }]}>
+          <Text style={styles.tagText}>{item.difficulty}</Text>
+        </View>
+        <TouchableOpacity onPress={() => onDelete(item._id)} style={styles.deleteBadge}>
+          <Text style={styles.deleteBadgeText}>✕</Text>
+        </TouchableOpacity>
       </View>
     </View>
     <Text style={styles.entryTopic}># {item.topic}</Text>
@@ -97,6 +102,17 @@ export default function EntriesScreen() {
     }
   };
 
+  const handleDeleteEntry = async (id) => {
+    try {
+      const { data } = await deleteEntry(id);
+      if (data.success) {
+        setEntries(prev => prev.filter(e => e._id !== id));
+      }
+    } catch (error) {
+      alert('Failed to delete entry');
+    }
+  };
+
   useEffect(() => {
     fetchEntries();
   }, []);
@@ -120,7 +136,7 @@ export default function EntriesScreen() {
 
       <FlatList
         data={entries}
-        renderItem={({ item }) => <EntryItem item={item} />}
+        renderItem={({ item }) => <EntryItem item={item} onDelete={handleDeleteEntry} />}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -425,5 +441,20 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     color: COLORS.textMuted,
+  },
+  deleteBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ef4444',
+  },
+  deleteBadgeText: {
+    color: '#ef4444',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });
