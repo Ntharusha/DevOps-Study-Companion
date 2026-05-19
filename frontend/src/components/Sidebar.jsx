@@ -12,6 +12,9 @@ import {
   HiOutlineUserCircle,
   HiOutlineFolderAdd,
   HiOutlineLightningBolt,
+  HiOutlineClock,
+  HiOutlineCalendar,
+  HiOutlineStar,
 } from 'react-icons/hi';
 
 function Sidebar({ open, onClose, user, onLogout }) {
@@ -29,6 +32,13 @@ function Sidebar({ open, onClose, user, onLogout }) {
     { to: '/interview', icon: <HiOutlineBookOpen />, label: 'Interview Helper' },
     { to: '/projects', icon: <HiOutlineFolderAdd />, label: 'Project Tracker' },
     { to: '/memory', icon: <HiOutlineLightningBolt />, label: 'Memory Bank' },
+  ];
+
+  const studyLinks = [
+    { to: '/timer',  icon: <HiOutlineClock />,    label: 'Focus Timer' },
+    { to: '/habits', icon: <HiOutlineCalendar />, label: 'Habits Tracker' },
+    { to: '/goals',  icon: <HiOutlineStar />,     label: 'Study Goals' },
+    { to: '/plant',  icon: <span style={{ fontSize: '1rem' }}>🌱</span>, label: 'Study Plant' },
   ];
 
   return (
@@ -77,6 +87,23 @@ function Sidebar({ open, onClose, user, onLogout }) {
             DevOps Tools
           </div>
           {toolLinks.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                `nav-link ${isActive ? 'active' : ''}`
+              }
+              onClick={onClose}
+            >
+              {link.icon}
+              {link.label}
+            </NavLink>
+          ))}
+          {/* Study Timer Section */}
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', padding: '20px 16px 4px', fontWeight: 700 }}>
+            Study Tools
+          </div>
+          {studyLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}

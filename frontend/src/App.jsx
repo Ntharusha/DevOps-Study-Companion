@@ -14,6 +14,10 @@ import Reports from './pages/Reports';
 import InterviewHelper from './pages/InterviewHelper';
 import Projects from './pages/Projects';
 import MemoryBank from './pages/MemoryBank';
+import FocusTimer from './pages/FocusTimer';
+import Habits from './pages/Habits';
+import Goals from './pages/Goals';
+import StudyPlant from './pages/StudyPlant';
 import Login from './pages/Login';
 import { HiMenu } from 'react-icons/hi';
 
@@ -72,6 +76,10 @@ function App() {
             <Route path="/interview" element={<InterviewHelper />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/memory" element={<MemoryBank />} />
+            <Route path="/timer" element={<FocusTimer />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/goals" element={<Goals />} />
+            <Route path="/plant" element={<StudyPlant />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
