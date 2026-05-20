@@ -25,7 +25,7 @@ const TOPIC_COLORS = {
   Other: '#6b7280',
 };
 
-export default function GoalsScreen() {
+export default function GoalsScreen({ navigation }) {
   const [goals, setGoals] = useState([]);
   const [summary, setSummary] = useState({ totalActual: 0, totalTarget: 0 });
   const [loading, setLoading] = useState(true);
@@ -38,7 +38,13 @@ export default function GoalsScreen() {
 
   useEffect(() => {
     fetchGoalsData();
-  }, []);
+
+    const unsubscribe = navigation?.addListener('focus', () => {
+      fetchGoalsData();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const fetchGoalsData = async () => {
     try {

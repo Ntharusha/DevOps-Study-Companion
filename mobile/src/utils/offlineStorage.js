@@ -416,11 +416,14 @@ function calculateStats() {
   });
 
   // Calculate XP and Levels
-  const totalXP = (totalHours * 100) + (totalEntries * 10);
+  const questXP = storage.getNumber('offline_quest_xp') || 0;
+  const totalXP = (totalHours * 100) + (totalEntries * 10) + questXP;
   const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
 
   const labsCompleted = labs.filter((l) => l.status === 'completed').length;
   const memoriesMastered = memory.filter((m) => m.strength >= 4).length;
+  const timer = getTable('timer');
+  const focusSessionsCount = timer.filter((t) => t.completed).length;
 
   const avgHoursPerDay =
     totalStudyDays > 0
@@ -438,6 +441,7 @@ function calculateStats() {
     level,
     labsCompleted,
     memoriesMastered,
+    focusSessionsCount,
     weeklyActivity,
     topicDistribution,
     difficultyDistribution: difficultyCount,
@@ -761,7 +765,42 @@ export const handleOfflineRequest = async (config) => {
   if (segments[0] === 'goals') {
     const goals = getTable('goals');
     if (method === 'GET') {
-      return { success: true, data: goals };
+      const targetWeek = getCurrentWeekLabel();
+      const currentWeekGoals = goals.filter(g => g.weekLabel === targetWeek);
+      const entries = getTable('entries');
+
+      const actualHoursMap = {};
+      entries.forEach(e => {
+        try {
+          const entryDate = new Date(e.date);
+          const entryWeekNum = getWeekNumber(entryDate);
+          const entryWeekLabel = `${entryDate.getFullYear()}-W${String(entryWeekNum).padStart(2, '0')}`;
+          if (entryWeekLabel === targetWeek) {
+            actualHoursMap[e.topic] = (actualHoursMap[e.topic] || 0) + e.timeSpent;
+          }
+        } catch (err) {}
+      });
+
+      const goalsWithActual = currentWeekGoals.map(g => ({
+        ...g,
+        actualHours: Math.round((actualHoursMap[g.topic] || 0) * 10) / 10,
+      }));
+
+      const totalActual = Object.values(actualHoursMap).reduce((a, b) => a + b, 0);
+      const totalTarget = currentWeekGoals.reduce((a, g) => a + g.targetHours, 0);
+
+      return {
+        success: true,
+        data: {
+          week: targetWeek,
+          goals: goalsWithActual,
+          summary: {
+            totalActual: Math.round(totalActual * 10) / 10,
+            totalTarget: Math.round(totalTarget * 10) / 10,
+            topicActuals: actualHoursMap,
+          }
+        }
+      };
     }
     if (method === 'POST') {
       const newGoal = {

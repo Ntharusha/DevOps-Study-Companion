@@ -7,6 +7,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
+import { storage } from '../utils/storage';
+import { scheduleLocalNotification } from '../utils/notificationHelper';
 
 const MenuItem = ({ title, icon, subtitle, onPress }) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
@@ -22,6 +24,25 @@ const MenuItem = ({ title, icon, subtitle, onPress }) => (
 );
 
 export default function MoreScreen({ navigation, onLogout }) {
+  const [notifsEnabled, setNotifsEnabled] = useState(storage.getBoolean('notifications_enabled') !== false);
+
+  const toggleNotifications = () => {
+    const nextVal = !notifsEnabled;
+    storage.set('notifications_enabled', nextVal);
+    setNotifsEnabled(nextVal);
+  };
+
+  const handleTestNotification = async () => {
+    try {
+      await scheduleLocalNotification(
+        'DevOps Companion Test 🧪',
+        '🌱 Study Plant status is healthy! Smart reminders are configured and active.'
+      );
+    } catch (err) {
+      alert('Failed to trigger notification. Please check permissions.');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -96,6 +117,22 @@ export default function MoreScreen({ navigation, onLogout }) {
           subtitle="Practice DevOps questions" 
           icon="🎤" 
           onPress={() => alert('Coming soon!')} 
+        />
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Notifications</Text>
+        <MenuItem 
+          title="Study Notifications" 
+          subtitle={notifsEnabled ? 'Enabled (Tap to Disable)' : 'Disabled (Tap to Enable)'} 
+          icon="🔔" 
+          onPress={toggleNotifications} 
+        />
+        <MenuItem 
+          title="Test Notification" 
+          subtitle="Trigger a local notification immediately" 
+          icon="🧪" 
+          onPress={handleTestNotification} 
         />
       </View>
 
