@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
   StyleSheet,
   View,
@@ -134,7 +135,7 @@ const TaskRow = ({ task, onToggle, onDelete }) => {
         onPress={() => onToggle(task._id)}
         activeOpacity={0.7}
       >
-        {task.completed && <Text style={styles.checkmark}>✓</Text>}
+        {task.completed && <Ionicons name="checkmark" size={18} color="#fff" />}
       </TouchableOpacity>
 
       <View style={styles.taskContent}>
@@ -306,7 +307,7 @@ export default function DailyTasksScreen() {
         {/* Celebration banner */}
         {allDone && (
           <View style={styles.celebrationBanner}>
-            <Text style={styles.celebrationEmoji}>🏆</Text>
+            <Ionicons name="trophy" size={36} color={COLORS.success} style={{ marginRight: SPACING.md }} />
             <View style={{ flex: 1 }}>
               <Text style={styles.celebrationTitle}>Fantastic work!</Text>
               <Text style={styles.celebrationSub}>
@@ -320,7 +321,7 @@ export default function DailyTasksScreen() {
         {suggestions.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>🤖 Suggested Study Tasks</Text>
+              <Text style={styles.sectionTitle}><Ionicons name="hardware-chip" size={16} color={COLORS.text} /> Suggested Study Tasks</Text>
               <Text style={styles.sectionBadge}>Auto-generated</Text>
             </View>
             {suggestions.map((task) => (
@@ -337,13 +338,13 @@ export default function DailyTasksScreen() {
         {/* My Tasks Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>📋 My Tasks</Text>
+            <Text style={styles.sectionTitle}><Ionicons name="list" size={16} color={COLORS.text} /> My Tasks</Text>
             <Text style={styles.sectionCount}>{userTasks.length} items</Text>
           </View>
 
           {userTasks.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📝</Text>
+              <Ionicons name="document-text-outline" size={36} color={COLORS.textMuted} style={{ marginBottom: SPACING.sm }} />
               <Text style={styles.emptyText}>
                 No personal tasks yet. Add your first task below!
               </Text>

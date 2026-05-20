@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
   StyleSheet,
   View,
@@ -13,7 +14,7 @@ import { scheduleLocalNotification } from '../utils/notificationHelper';
 const MenuItem = ({ title, icon, subtitle, onPress }) => (
   <TouchableOpacity style={styles.menuItem} onPress={onPress}>
     <View style={styles.iconContainer}>
-      <Text style={styles.menuIcon}>{icon}</Text>
+      <Ionicons name={icon} size={20} color={COLORS.primary} />
     </View>
     <View style={styles.menuText}>
       <Text style={styles.menuTitle}>{title}</Text>
@@ -35,8 +36,8 @@ export default function MoreScreen({ navigation, onLogout }) {
   const handleTestNotification = async () => {
     try {
       await scheduleLocalNotification(
-        'DevOps Companion Test 🧪',
-        '🌱 Study Plant status is healthy! Smart reminders are configured and active.'
+        'DevOps Companion Test',
+        'Study Plant status is healthy! Smart reminders are configured and active.'
       );
     } catch (err) {
       alert('Failed to trigger notification. Please check permissions.');
@@ -55,13 +56,13 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Projects Tracker" 
           subtitle="Manage your side projects and time" 
-          icon="📁" 
+          icon="folder-open" 
           onPress={() => navigation.navigate('Projects')} 
         />
         <MenuItem 
           title="Memory Bank" 
           subtitle="Spaced repetition learning" 
-          icon="🧠" 
+          icon="hardware-chip" 
           onPress={() => navigation.navigate('Memory')} 
         />
       </View>
@@ -71,13 +72,13 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Commands Bank" 
           subtitle="Quick terminal command reference" 
-          icon="⌨️" 
+          icon="terminal" 
           onPress={() => navigation.navigate('Commands')} 
         />
         <MenuItem 
           title="Progress Reports" 
           subtitle="XP, Levels, and statistics" 
-          icon="📈" 
+          icon="bar-chart" 
           onPress={() => navigation.navigate('Reports')} 
         />
       </View>
@@ -87,31 +88,31 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Focus Timer" 
           subtitle="Pomodoro focus sessions" 
-          icon="⏱️" 
+          icon="timer" 
           onPress={() => navigation.navigate('FocusTimer')} 
         />
         <MenuItem 
           title="Habits Tracker" 
           subtitle="Build consistency daily" 
-          icon="📅" 
+          icon="calendar" 
           onPress={() => navigation.navigate('Habits')} 
         />
         <MenuItem 
           title="Study Goals" 
           subtitle="Hours target vs actual progress" 
-          icon="🎯" 
+          icon="trophy" 
           onPress={() => navigation.navigate('Goals')} 
         />
         <MenuItem 
           title="Study Plant" 
           subtitle="Gamified study partner growth" 
-          icon="🌱" 
+          icon="leaf" 
           onPress={() => navigation.navigate('StudyPlant')} 
         />
         <MenuItem 
           title="Daily Tasks" 
           subtitle="Your daily to-do checklist with AI suggestions" 
-          icon="✅" 
+          icon="checkmark-circle" 
           onPress={() => navigation.navigate('DailyTasks')} 
         />
       </View>
@@ -121,7 +122,7 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Mock Interviews" 
           subtitle="Practice DevOps questions" 
-          icon="🎤" 
+          icon="mic" 
           onPress={() => alert('Coming soon!')} 
         />
       </View>
@@ -131,13 +132,13 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Study Notifications" 
           subtitle={notifsEnabled ? 'Enabled (Tap to Disable)' : 'Disabled (Tap to Enable)'} 
-          icon="🔔" 
+          icon="notifications" 
           onPress={toggleNotifications} 
         />
         <MenuItem 
           title="Test Notification" 
           subtitle="Trigger a local notification immediately" 
-          icon="🧪" 
+          icon="flask" 
           onPress={handleTestNotification} 
         />
       </View>
@@ -147,7 +148,7 @@ export default function MoreScreen({ navigation, onLogout }) {
         <MenuItem 
           title="Sign Out" 
           subtitle="Log out of your account" 
-          icon="🚪" 
+          icon="log-out" 
           onPress={onLogout} 
         />
       </View>

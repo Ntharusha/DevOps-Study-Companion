@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import {
   StyleSheet,
   View,
@@ -156,11 +157,11 @@ export default function DashboardScreen({ navigation }) {
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <View>
-            <Text style={styles.welcomeText}>Hello, ghost69! 🚀</Text>
+            <Text style={styles.welcomeText}>Hello, ghost69! <Ionicons name="rocket" size={12} color={COLORS.secondary} /></Text>
             <Text style={styles.title}>Ready to Level Up?</Text>
           </View>
           <View style={styles.notificationBell}>
-            <Text style={{ fontSize: 20 }}>🔔</Text>
+            <Ionicons name="notifications-outline" size={20} color={COLORS.text} />
           </View>
         </View>
       </View>
@@ -172,7 +173,7 @@ export default function DashboardScreen({ navigation }) {
         activeOpacity={0.8}
       >
         <View style={styles.tasksWidgetHeader}>
-          <Text style={styles.tasksWidgetTitle}>✅ Daily Checklist Progress</Text>
+          <Text style={styles.tasksWidgetTitle}><Ionicons name="checkmark-circle" size={14} color={COLORS.success} /> Daily Checklist Progress</Text>
           <Text style={styles.tasksWidgetGoBtn}>Manage ›</Text>
         </View>
         <View style={styles.tasksWidgetProgressRow}>
@@ -180,7 +181,7 @@ export default function DashboardScreen({ navigation }) {
             {tasksCount.completed} of {tasksCount.total} tasks completed
           </Text>
           {tasksCount.total > 0 && tasksCount.completed === tasksCount.total && (
-            <Text style={styles.tasksWidgetSuccessBadge}>All Done! 🎉</Text>
+            <Text style={styles.tasksWidgetSuccessBadge}><Ionicons name="star" size={11} color={COLORS.success} /> All Done!</Text>
           )}
         </View>
         <View style={styles.tasksWidgetProgressBarTrack}>
@@ -201,7 +202,7 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.plantCard}>
         <View style={styles.plantHeader}>
-          <Text style={styles.plantTitle}>🌱 Study Plant Level Progress</Text>
+          <Text style={styles.plantTitle}><Ionicons name="leaf" size={14} color={COLORS.success} /> Study Plant Level Progress</Text>
           <Text style={styles.plantLevelBadge}>Lv. {plantInfo.level}</Text>
         </View>
         
@@ -248,7 +249,7 @@ export default function DashboardScreen({ navigation }) {
         <StatCard
           index={1}
           label="Streak"
-          value={`${stats.currentStreak} 🔥`}
+          value={<>{stats.currentStreak} <Ionicons name="flame" size={24} color="#f97316" /></>}
           sub={`Longest: ${stats.longestStreak} days`}
           colors={GRADIENTS.secondary}
         />
@@ -270,7 +271,7 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.questsCard}>
         <View style={styles.questsHeader}>
-          <Text style={styles.questsTitle}>🎯 Daily Quests</Text>
+          <Text style={styles.questsTitle}><Ionicons name="trophy" size={16} color={COLORS.text} /> Daily Quests</Text>
           <Text style={styles.questsSub}>+50 XP each</Text>
         </View>
         {quests.length === 0 ? (
@@ -279,7 +280,7 @@ export default function DashboardScreen({ navigation }) {
           quests.map((quest) => (
             <View key={quest.id} style={styles.questRow}>
               <View style={[styles.questCheckbox, quest.completed && styles.questCheckboxCompleted]}>
-                {quest.completed && <Text style={styles.checkmark}>✓</Text>}
+                {quest.completed && <Ionicons name="checkmark" size={16} color="#fff" />}
               </View>
               <View style={styles.questInfo}>
                 <Text style={[styles.questText, quest.completed && styles.questTextCompleted]}>
