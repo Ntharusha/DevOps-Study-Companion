@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - dev
     paths:
       - 'mobile/**'
       - '.github/workflows/android_build.yml'
@@ -36,19 +37,17 @@ jobs:
           cd mobile
           npm install
 
-      - name: 🛠 Build APK
+      - name: 🛠 Build Release APK
         run: |
           cd mobile
           npx expo prebuild --platform android --no-install
-          mkdir -p android/app/src/main/assets
-          npx expo export:embed --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease
 
       - name: 📤 Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: devops-companion-apk
-          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 7

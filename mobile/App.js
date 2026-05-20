@@ -9,7 +9,6 @@ import { View, ActivityIndicator, Text } from 'react-native';
 import { COLORS } from './src/theme';
 import { getObject, setItem, removeItem, StorageKeys } from './src/utils/storage';
 import LoginScreen from './src/screens/LoginScreen';
-import SignupScreen from './src/screens/SignupScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import EntriesScreen from './src/screens/EntriesScreen';
 import LabsScreen from './src/screens/LabsScreen';
@@ -119,10 +118,6 @@ export default function App() {
     setItem(StorageKeys.USER_SESSION, userData);
   };
 
-  const handleSignup = (userData) => {
-    setUser(userData);
-    setItem(StorageKeys.USER_SESSION, userData);
-  };
 
   const handleLogout = () => {
     setUser(null);
@@ -146,9 +141,7 @@ export default function App() {
             <Stack.Screen name="Login">
               {(props) => <LoginScreen {...props} onLogin={handleLogin} />}
             </Stack.Screen>
-            <Stack.Screen name="Signup">
-              {(props) => <SignupScreen {...props} onSignup={handleSignup} />}
-            </Stack.Screen>
+
           </>
         ) : (
           <Stack.Screen name="Main">
