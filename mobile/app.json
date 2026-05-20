@@ -12,9 +12,9 @@
       "package": "com.ghost69.devopscompanion",
       "versionCode": 1
     },
-    "icon": "../../../../../.gemini/antigravity/brain/26b15f82-3ee7-41c8-a9d4-47f4d2affaaa/devops_companion_icon_1779213265074.png",
+    "icon": "./assets/icon.png",
     "splash": {
-      "image": "../../../../../.gemini/antigravity/brain/26b15f82-3ee7-41c8-a9d4-47f4d2affaaa/devops_companion_icon_1779213265074.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     }

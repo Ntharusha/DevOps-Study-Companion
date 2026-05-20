@@ -47,34 +47,51 @@ export default function FocusTimerScreen() {
   };
 
   useEffect(() => {
+    let interval = null;
     if (isActive) {
-      timerRef.current = setInterval(() => {
+      interval = setInterval(() => {
         setTimeLeft((prev) => {
           if (mode === 'stopwatch') {
             return prev + 1;
           }
           if (prev <= 1) {
-            handleSessionComplete();
             return 0;
           }
           return prev - 1;
         });
       }, 1000);
+      timerRef.current = interval;
     } else {
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     }
-    return () => clearInterval(timerRef.current);
-  }, [isActive, mode, phase]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isActive, mode]);
+
+  // Watch for countdown/pomodoro timer completion
+  useEffect(() => {
+    if (isActive && mode !== 'stopwatch' && timeLeft === 0) {
+      handleSessionComplete();
+    }
+  }, [timeLeft, isActive, mode]);
 
   const handleSessionComplete = async () => {
     setIsActive(false);
-    clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    const workMin = parseInt(customWorkMin) || 25;
+    const breakMin = parseInt(customBreakMin) || 5;
 
     let durationMinutes = 0;
     if (mode === 'pomodoro') {
-      durationMinutes = phase === 'work' ? parseInt(customWorkMin) : parseInt(customBreakMin);
+      durationMinutes = phase === 'work' ? workMin : breakMin;
     } else if (mode === 'countdown') {
-      durationMinutes = parseInt(customWorkMin);
+      durationMinutes = workMin;
     } else if (mode === 'stopwatch') {
       durationMinutes = Math.round(timeLeft / 60);
       if (durationMinutes === 0 && timeLeft > 0) {
@@ -112,22 +129,23 @@ export default function FocusTimerScreen() {
 
     // Toggle Phase for Pomodoro
     if (mode === 'pomodoro') {
+      const targetCount = parseInt(targetSessions) || 4;
       if (phase === 'work') {
-        if (autoStartBreak && currentCount < parseInt(targetSessions)) {
+        if (autoStartBreak && currentCount < targetCount) {
           setPhase('break');
-          setTimeLeft(parseInt(customBreakMin) * 60);
+          setTimeLeft(breakMin * 60);
           setIsActive(true);
         } else {
           setPhase('work');
-          setTimeLeft(parseInt(customWorkMin) * 60);
-          if (currentCount >= parseInt(targetSessions)) {
-            alert(`🎉 All ${targetSessions} sessions completed! Great job!`);
+          setTimeLeft(workMin * 60);
+          if (currentCount >= targetCount) {
+            alert(`🎉 All ${targetCount} sessions completed! Great job!`);
           }
         }
       } else {
         setPhase('work');
-        setTimeLeft(parseInt(customWorkMin) * 60);
-        if (autoResumeWork && currentCount < parseInt(targetSessions)) {
+        setTimeLeft(workMin * 60);
+        if (autoResumeWork && currentCount < targetCount) {
           setIsActive(true);
         }
       }

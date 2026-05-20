@@ -142,7 +142,7 @@ export default function GoalsScreen() {
           )}
         </View>
 
-        {goals.length === 0 ? (
+        {(!goals || goals.length === 0) ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyText}>🎯 No goals set for this week.</Text>
           </View>

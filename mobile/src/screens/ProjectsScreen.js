@@ -29,7 +29,7 @@ const ProjectItem = ({ item, onAddTime, onDelete }) => (
     <Text style={styles.desc} numberOfLines={2}>{item.description}</Text>
     
     <View style={styles.techContainer}>
-      {item.technologies.map(tech => (
+      {(item.technologies || []).map(tech => (
         <View key={tech} style={styles.techTag}>
           <Text style={styles.techText}>{tech}</Text>
         </View>
