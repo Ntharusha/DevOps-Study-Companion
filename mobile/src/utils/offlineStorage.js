@@ -38,7 +38,7 @@ function calculateTimerXP(minutes, mode) {
   return Math.max(5, Math.round(base * multiplier));
 }
 
-function getPlantLevel(xp) {
+export function getPlantLevel(xp) {
   if (xp < 50) return { level: 1, name: 'Seed 🌱', emoji: '🌱', next: 50 };
   if (xp < 150) return { level: 2, name: 'Sprout 🌿', emoji: '🌿', next: 150 };
   if (xp < 300) return { level: 3, name: 'Sapling 🌾', emoji: '🌾', next: 300 };
