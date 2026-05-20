@@ -8,6 +8,7 @@ import { View, ActivityIndicator, Text } from 'react-native';
 
 import { COLORS } from './src/theme';
 import { getObject, setItem, removeItem, StorageKeys } from './src/utils/storage';
+import { initDB } from './src/utils/offlineStorage';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import EntriesScreen from './src/screens/EntriesScreen';
@@ -106,18 +107,32 @@ export default function App() {
 
   useEffect(() => {
     // Check for saved user session on app start
-    const savedUser = getObject(StorageKeys.USER_SESSION);
-    if (savedUser) {
-      setUser(savedUser);
+    let savedUser = getObject(StorageKeys.USER_SESSION);
+    if (!savedUser) {
+      // Auto-initialize offline session for a completely standalone offline experience
+      savedUser = {
+        username: 'ghost69',
+        token: 'simple-auth-token-offline-mode',
+        offline: true,
+      };
+      setItem(StorageKeys.USER_SESSION, savedUser);
     }
+
+    if (savedUser.offline) {
+      initDB(); // Seed local DB
+    }
+
+    setUser(savedUser);
     setInitializing(false);
   }, []);
 
   const handleLogin = (userData) => {
+    if (userData.offline) {
+      initDB(); // Seed local DB
+    }
     setUser(userData);
     setItem(StorageKeys.USER_SESSION, userData);
   };
-
 
   const handleLogout = () => {
     setUser(null);
