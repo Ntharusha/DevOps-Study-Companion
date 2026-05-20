@@ -24,6 +24,11 @@ const api = axios.create({
   },
 });
 
+export const updateApiBaseUrl = (newUrl) => {
+  setItem('API_BASE_URL', newUrl);
+  api.defaults.baseURL = newUrl;
+};
+
 // Helper for cached GET requests
 const cachedGet = async (url, config = {}, cacheKey) => {
   const finalKey = cacheKey || url;
