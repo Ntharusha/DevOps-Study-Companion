@@ -25,6 +25,7 @@ import FocusTimerScreen from './src/screens/FocusTimerScreen';
 import HabitsScreen from './src/screens/HabitsScreen';
 import GoalsScreen from './src/screens/GoalsScreen';
 import StudyPlantScreen from './src/screens/StudyPlantScreen';
+import DailyTasksScreen from './src/screens/DailyTasksScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,6 +49,7 @@ function ToolsStack({ onLogout }) {
       <Stack.Screen name="Habits" component={HabitsScreen} options={{ title: 'Habits Tracker' }} />
       <Stack.Screen name="Goals" component={GoalsScreen} options={{ title: 'Weekly Goals' }} />
       <Stack.Screen name="StudyPlant" component={StudyPlantScreen} options={{ title: 'Study Plant' }} />
+      <Stack.Screen name="DailyTasks" component={DailyTasksScreen} options={{ title: 'Daily Tasks' }} />
     </Stack.Navigator>
   );
 }

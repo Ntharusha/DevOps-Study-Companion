@@ -7,11 +7,22 @@ import {
   RefreshControl,
   ActivityIndicator,
   Animated,
+  TouchableOpacity,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS, GRADIENTS, SHADOWS } from '../theme';
 import { getStats } from '../api';
 import { evaluateQuests } from '../utils/questHelper';
 import { getPlantLevel } from '../utils/offlineStorage';
+import { storage } from '../utils/storage';
+
+const DEVOPS_QUOTES = [
+  { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+  { text: "If it hurts, do it more often.", author: "Jez Humble" },
+  { text: "Continuous improvement is better than delayed perfection.", author: "Mark Twain" },
+  { text: "Automate everything that is boring.", author: "DevOps Mantra" },
+  { text: "Fail fast, learn faster.", author: "Agile Maxim" },
+  { text: "Programs must be written for people to read, and only secondarily for machines to execute.", author: "Abelson & Sussman" }
+];
 
 const StatCard = ({ label, value, sub, colors, index }) => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -59,9 +70,32 @@ export default function DashboardScreen({ navigation }) {
   const [quests, setQuests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [tasksCount, setTasksCount] = useState({ completed: 0, total: 0 });
+  const [quote, setQuote] = useState({ text: '', author: '' });
+
+  const loadDailyTasksSummary = () => {
+    try {
+      const userTasksData = storage.getString('daily_tasks_user');
+      const userTasks = userTasksData ? JSON.parse(userTasksData) : [];
+      const suggestionsData = storage.getString('daily_tasks_suggestions');
+      const suggestions = suggestionsData ? JSON.parse(suggestionsData) : [];
+      const allTasks = [...userTasks, ...suggestions];
+      const completed = allTasks.filter(t => t.completed).length;
+      setTasksCount({ completed, total: allTasks.length });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const fetchStats = async () => {
     try {
+      const { data } = await getStats();
+      setStats(data.data);
+      // Run quests evaluation to check completions
+      const updatedQuests = evaluateQuests();
+      setQuests(updatedQuests);
+      loadDailyTasksSummary();
+    } catch (error) {
       const { data } = await getStats();
       setStats(data.data);
       // Run quests evaluation to check completions
@@ -78,7 +112,11 @@ export default function DashboardScreen({ navigation }) {
   useEffect(() => {
     fetchStats();
 
-    // Listen to focus event so stats/quests refresh when switching tabs
+    // Pick daily quote
+    const todayIndex = new Date().getDate() % DEVOPS_QUOTES.length;
+    setQuote(DEVOPS_QUOTES[todayIndex]);
+
+    // Listen to focus event so stats/quests/tasks refresh when switching tabs
     const unsubscribe = navigation?.addListener('focus', () => {
       fetchStats();
     });
@@ -131,6 +169,40 @@ export default function DashboardScreen({ navigation }) {
             <Text style={{ fontSize: 20 }}>🔔</Text>
           </View>
         </View>
+      </View>
+
+      {/* Daily Tasks Summary Widget */}
+      <TouchableOpacity 
+        style={styles.tasksWidgetCard} 
+        onPress={() => navigation.navigate('More', { screen: 'DailyTasks' })}
+        activeOpacity={0.8}
+      >
+        <View style={styles.tasksWidgetHeader}>
+          <Text style={styles.tasksWidgetTitle}>✅ Daily Checklist Progress</Text>
+          <Text style={styles.tasksWidgetGoBtn}>Manage ›</Text>
+        </View>
+        <View style={styles.tasksWidgetProgressRow}>
+          <Text style={styles.tasksWidgetCountText}>
+            {tasksCount.completed} of {tasksCount.total} tasks completed
+          </Text>
+          {tasksCount.total > 0 && tasksCount.completed === tasksCount.total && (
+            <Text style={styles.tasksWidgetSuccessBadge}>All Done! 🎉</Text>
+          )}
+        </View>
+        <View style={styles.tasksWidgetProgressBarTrack}>
+          <View 
+            style={[
+              styles.tasksWidgetProgressBarFill, 
+              { width: `${tasksCount.total > 0 ? (tasksCount.completed / tasksCount.total) * 100 : 0}%` }
+            ]} 
+          />
+        </View>
+      </TouchableOpacity>
+
+      {/* Daily Motivational Quote */}
+      <View style={styles.quoteCard}>
+        <Text style={styles.quoteText}>“{quote.text}”</Text>
+        <Text style={styles.quoteAuthor}>— {quote.author}</Text>
       </View>
 
       <View style={styles.plantCard}>
@@ -550,5 +622,81 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '800',
     color: COLORS.secondary,
+  },
+  tasksWidgetCard: {
+    backgroundColor: COLORS.card,
+    marginHorizontal: SPACING.md,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(99, 102, 241, 0.2)', // primary glow border
+    marginBottom: SPACING.md,
+  },
+  tasksWidgetHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  tasksWidgetTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  tasksWidgetGoBtn: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  tasksWidgetProgressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  tasksWidgetCountText: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  tasksWidgetSuccessBadge: {
+    color: COLORS.success,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  tasksWidgetProgressBarTrack: {
+    height: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  tasksWidgetProgressBarFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 3,
+  },
+  quoteCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    marginHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  quoteText: {
+    color: COLORS.text,
+    fontSize: 12,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    lineHeight: 18,
+    fontWeight: '500',
+  },
+  quoteAuthor: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 4,
   },
 });

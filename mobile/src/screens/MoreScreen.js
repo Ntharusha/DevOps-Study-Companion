@@ -108,6 +108,12 @@ export default function MoreScreen({ navigation, onLogout }) {
           icon="🌱" 
           onPress={() => navigation.navigate('StudyPlant')} 
         />
+        <MenuItem 
+          title="Daily Tasks" 
+          subtitle="Your daily to-do checklist with AI suggestions" 
+          icon="✅" 
+          onPress={() => navigation.navigate('DailyTasks')} 
+        />
       </View>
 
       <View style={styles.section}>
