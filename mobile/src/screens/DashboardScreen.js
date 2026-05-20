@@ -135,7 +135,7 @@ export default function DashboardScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Topics Mastery</Text>
-        {stats.topicDistribution.map((topic, index) => (
+        {(stats.topicDistribution || []).map((topic, index) => (
           <View key={index} style={styles.topicRow}>
             <View style={styles.topicInfo}>
               <Text style={styles.topicName}>{topic.topic}</Text>
