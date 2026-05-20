@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 import axios from 'axios';
 import { getObject, setItem, getItem } from './utils/storage';
 
+import { handleOfflineRequest } from './utils/offlineStorage';
+
 const getBaseUrl = () => {
   const savedUrl = getItem('API_BASE_URL');
   if (savedUrl) return savedUrl;
@@ -23,6 +25,50 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Intercept requests and route to offline storage when offline mode is active
+const isOfflineMode = () => {
+  try {
+    const user = getObject('user_session');
+    return !!(user && user.offline === true);
+  } catch (e) {
+    return false;
+  }
+};
+
+api.interceptors.request.use(
+  async (config) => {
+    if (isOfflineMode()) {
+      config.adapter = async (cfg) => {
+        try {
+          const result = await handleOfflineRequest(cfg);
+          return {
+            data: result,
+            status: 200,
+            statusText: 'OK',
+            headers: { 'content-type': 'application/json' },
+            config: cfg,
+          };
+        } catch (err) {
+          const status = err.status || 500;
+          const errorObj = new Error(err.message || 'Offline API Request Failed');
+          errorObj.response = {
+            data: { success: false, message: err.message },
+            status: status,
+            statusText: status === 401 ? 'Unauthorized' : 'Error',
+            headers: {},
+            config: cfg,
+          };
+          throw errorObj;
+        }
+      };
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const updateApiBaseUrl = (newUrl) => {
   setItem('API_BASE_URL', newUrl);

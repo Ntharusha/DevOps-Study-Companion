@@ -26,6 +26,14 @@ export default function LoginScreen({ navigation, onLogin }) {
     setShowServerConfig(false);
   };
 
+  const handleOfflineLogin = () => {
+    onLogin({
+      username: 'ghost69',
+      token: 'simple-auth-token-offline-mode',
+      offline: true,
+    });
+  };
+
   const handleLogin = async () => {
     if (!username || !password) return;
     setLoading(true);
@@ -35,7 +43,13 @@ export default function LoginScreen({ navigation, onLogin }) {
         onLogin(data.user);
       }
     } catch (error) {
-      alert('Login failed. Please check your credentials.');
+      console.log('Login error details:', error);
+      const isNetworkError = !error.response || error.message?.includes('Network Error') || error.code === 'ERR_NETWORK';
+      if (isNetworkError) {
+        alert('Could not connect to the backend server.\n\nPlease verify your server IP/URL settings under server config, ensure the backend is running, or tap "Use Offline Mode" to start immediately without a server.');
+      } else {
+        alert('Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }
@@ -77,14 +91,22 @@ export default function LoginScreen({ navigation, onLogin }) {
           </View>
 
           <TouchableOpacity
-            style={styles.button}
+            style={styles.offlineButton}
+            onPress={handleOfflineLogin}
+            disabled={loading}
+          >
+            <Text style={styles.offlineButtonText}>🚀 Launch Offline Workspace</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.onlineButton]}
             onPress={handleLogin}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={COLORS.primary} />
             ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={styles.onlineButtonText}>Connect & Sign In</Text>
             )}
           </TouchableOpacity>
 
@@ -192,13 +214,29 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   button: {
-    backgroundColor: COLORS.primary,
     borderRadius: RADIUS.sm,
     padding: SPACING.md,
     alignItems: 'center',
     marginTop: SPACING.md,
   },
-  buttonText: {
+  onlineButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: COLORS.primary,
+  },
+  onlineButtonText: {
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  offlineButton: {
+    backgroundColor: COLORS.success,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
+    alignItems: 'center',
+    marginTop: SPACING.md,
+  },
+  offlineButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
