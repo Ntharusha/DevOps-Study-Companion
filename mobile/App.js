@@ -9,6 +9,9 @@ import { View, ActivityIndicator, Text } from 'react-native';
 import { COLORS } from './src/theme';
 import { getObject, setItem, removeItem, StorageKeys } from './src/utils/storage';
 import { initDB } from './src/utils/offlineStorage';
+import * as BackgroundTask from 'expo-background-task';
+import { requestNotificationPermissions } from './src/utils/notificationHelper';
+import { NOTIFICATION_BACKGROUND_TASK } from './src/utils/backgroundWorker';
 import LoginScreen from './src/screens/LoginScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import EntriesScreen from './src/screens/EntriesScreen';
@@ -121,6 +124,22 @@ export default function App() {
     if (savedUser.offline) {
       initDB(); // Seed local DB
     }
+
+    // Set up local notifications and register background task
+    const initNotifications = async () => {
+      try {
+        const permitted = await requestNotificationPermissions();
+        if (permitted) {
+          await BackgroundTask.registerTaskAsync(NOTIFICATION_BACKGROUND_TASK, {
+            minimumInterval: 60 * 60, // Check study status every hour
+          });
+          console.log('[App] Background study notifications registered successfully!');
+        }
+      } catch (err) {
+        console.warn('[App] Failed to initialize background notifications:', err);
+      }
+    };
+    initNotifications();
 
     setUser(savedUser);
     setInitializing(false);
