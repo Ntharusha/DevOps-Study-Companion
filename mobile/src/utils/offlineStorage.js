@@ -416,11 +416,14 @@ function calculateStats() {
   });
 
   // Calculate XP and Levels
-  const totalXP = (totalHours * 100) + (totalEntries * 10);
+  const questXP = storage.getNumber('offline_quest_xp') || 0;
+  const totalXP = (totalHours * 100) + (totalEntries * 10) + questXP;
   const level = Math.floor(Math.sqrt(totalXP / 100)) + 1;
 
   const labsCompleted = labs.filter((l) => l.status === 'completed').length;
   const memoriesMastered = memory.filter((m) => m.strength >= 4).length;
+  const timer = getTable('timer');
+  const focusSessionsCount = timer.filter((t) => t.completed).length;
 
   const avgHoursPerDay =
     totalStudyDays > 0
@@ -438,6 +441,7 @@ function calculateStats() {
     level,
     labsCompleted,
     memoriesMastered,
+    focusSessionsCount,
     weeklyActivity,
     topicDistribution,
     difficultyDistribution: difficultyCount,

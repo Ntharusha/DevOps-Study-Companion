@@ -26,7 +26,61 @@ const ProgressSection = ({ title, current, total, color }) => {
   );
 };
 
-export default function ReportsScreen() {
+const ACHIEVEMENTS = [
+  {
+    id: 'docker_captain',
+    title: '🐳 Docker Captain',
+    desc: 'Log 3 Docker study entries',
+    condition: (stats) => {
+      const topic = (stats.topicDistribution || []).find(t => t.topic.toLowerCase() === 'docker');
+      return (topic ? topic.count : 0) >= 3;
+    }
+  },
+  {
+    id: 'k8s_commander',
+    title: '☸️ K8s Commander',
+    desc: 'Log 3 Kubernetes/K8s study entries',
+    condition: (stats) => {
+      const topic = (stats.topicDistribution || []).find(t => t.topic.toLowerCase() === 'kubernetes' || t.topic.toLowerCase() === 'k8s');
+      return (topic ? topic.count : 0) >= 3;
+    }
+  },
+  {
+    id: 'linux_guru',
+    title: '🐧 Linux Guru',
+    desc: 'Log 3 Linux study entries',
+    condition: (stats) => {
+      const topic = (stats.topicDistribution || []).find(t => t.topic.toLowerCase() === 'linux');
+      return (topic ? topic.count : 0) >= 3;
+    }
+  },
+  {
+    id: 'time_bender',
+    title: '⏱️ Time Bender',
+    desc: 'Complete 3 Pomodoro Focus Timer sessions',
+    condition: (stats) => (stats.focusSessionsCount || 0) >= 3,
+  },
+  {
+    id: 'recall_expert',
+    title: '🧠 Recall Expert',
+    desc: 'Master 3 concepts (strength >= 4) in the Memory Bank',
+    condition: (stats) => (stats.memoriesMastered || 0) >= 3,
+  },
+  {
+    id: 'green_thumb',
+    title: '🌱 Green Thumb',
+    desc: 'Grow your Study Plant to Level 3 (Sapling) or higher',
+    condition: (stats) => (stats.level || 1) >= 3,
+  },
+  {
+    id: 'unstoppable',
+    title: '🔥 Unstoppable',
+    desc: 'Reach a study streak of 3 days',
+    condition: (stats) => (stats.currentStreak || 0) >= 3,
+  }
+];
+
+export default function ReportsScreen({ navigation }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -45,7 +99,14 @@ export default function ReportsScreen() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+
+    // Listen to focus event to update badges instantly when navigating here
+    const unsubscribe = navigation?.addListener('focus', () => {
+      fetchData();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   if (loading) {
     return (
@@ -105,6 +166,30 @@ export default function ReportsScreen() {
         <View style={styles.smallCard}>
           <Text style={styles.smallLabel}>Concepts Mastered</Text>
           <Text style={styles.smallValue}>{stats.memoriesMastered || 0}</Text>
+        </View>
+      </View>
+
+      <View style={styles.achievementsCard}>
+        <Text style={styles.chartTitle}>🏆 Achievements Gallery</Text>
+        <View style={styles.badgeGrid}>
+          {ACHIEVEMENTS.map((badge) => {
+            const unlocked = badge.condition(stats);
+            return (
+              <TouchableOpacity 
+                key={badge.id} 
+                style={[styles.badgeCell, unlocked ? styles.badgeCellUnlocked : styles.badgeCellLocked]}
+                onPress={() => alert(`${badge.title}\n\n${badge.desc}\n\nStatus: ${unlocked ? '🎉 Unlocked!' : '🔒 Locked'}`)}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.badgeIcon, !unlocked && { opacity: 0.25 }]}>
+                  {badge.title.split(' ')[0]}
+                </Text>
+                <Text style={styles.badgeLabel} numberOfLines={1}>
+                  {badge.title.split(' ').slice(1).join(' ')}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
@@ -254,5 +339,48 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.secondary,
     borderRadius: 4,
     opacity: 0.6,
+  },
+  achievementsCard: {
+    backgroundColor: COLORS.card,
+    marginHorizontal: SPACING.md,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginTop: SPACING.md,
+  },
+  badgeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 8,
+  },
+  badgeCell: {
+    width: '30%',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xs,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+  },
+  badgeCellUnlocked: {
+    borderColor: COLORS.success,
+    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+  },
+  badgeCellLocked: {
+    borderColor: COLORS.border,
+    opacity: 0.6,
+  },
+  badgeIcon: {
+    fontSize: 28,
+    marginBottom: 6,
+  },
+  badgeLabel: {
+    color: COLORS.text,
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
   },
 });
