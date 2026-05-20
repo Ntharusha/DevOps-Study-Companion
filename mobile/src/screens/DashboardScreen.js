@@ -96,12 +96,6 @@ export default function DashboardScreen({ navigation }) {
       setQuests(updatedQuests);
       loadDailyTasksSummary();
     } catch (error) {
-      const { data } = await getStats();
-      setStats(data.data);
-      // Run quests evaluation to check completions
-      const updatedQuests = evaluateQuests();
-      setQuests(updatedQuests);
-    } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
