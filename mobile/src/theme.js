@@ -2,37 +2,40 @@ export const COLORS = {
   primary: '#6366f1',
   secondary: '#06b6d4',
   accent: '#8b5cf6',
-  background: '#0f172a',
-  card: '#1e293b',
+  background: '#060913', // Pitch-black navy
+  card: '#0f172a',       // Darker charcoal card
   text: '#f8fafc',
   textMuted: '#94a3b8',
-  border: '#334155',
+  border: 'rgba(255, 255, 255, 0.08)', // Ultra soft borders
   success: '#10b981',
   error: '#ef4444',
   warning: '#f59e0b',
   glass: 'rgba(255, 255, 255, 0.03)',
+  neonCyan: '#00f0ff',
+  neonPink: '#d946ef',
 };
 
 export const GRADIENTS = {
   primary: ['#6366f1', '#8b5cf6'],
   secondary: ['#06b6d4', '#2dd4bf'],
-  dark: ['#0f172a', '#1e293b'],
+  dark: ['#060913', '#0f172a'],
+  neon: ['#00f0ff', '#d946ef'],
 };
 
 export const SHADOWS = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 2,
   },
   md: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 5,
   },
 };
 

@@ -212,12 +212,14 @@ export default function FocusTimerScreen() {
             <Text style={styles.badgeText}>{phase.toUpperCase()}</Text>
           </View>
         )}
-        <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
-        {mode === 'pomodoro' && (
-          <Text style={{color: COLORS.textMuted, fontSize: 14, marginTop: -10, marginBottom: 15, fontWeight: '600'}}>
-            Session {sessionCount} of {targetSessions}
-          </Text>
-        )}
+        <View style={styles.timerCircle}>
+          <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+          {mode === 'pomodoro' && (
+            <Text style={{color: COLORS.textMuted, fontSize: 11, fontWeight: '700', marginTop: 2}}>
+              Session {sessionCount} / {targetSessions}
+            </Text>
+          )}
+        </View>
 
         <View style={styles.controls}>
           <TouchableOpacity style={styles.btnPlay} onPress={handleStartPause}>
@@ -320,16 +322,52 @@ const styles = StyleSheet.create({
   activeTab: { backgroundColor: COLORS.primary },
   tabText: { color: COLORS.textMuted, fontWeight: '700', fontSize: 12 },
   activeTabText: { color: '#fff' },
-  timerCard: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
-  timerText: { fontSize: 64, fontWeight: '800', color: COLORS.text, fontFamily: 'monospace', marginVertical: SPACING.md },
+  timerCard: { 
+    backgroundColor: COLORS.card, 
+    borderRadius: RADIUS.lg, 
+    padding: 32, 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: 'rgba(99, 102, 241, 0.25)', 
+    marginBottom: SPACING.lg 
+  },
+  timerCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 6,
+    borderColor: 'rgba(255, 255, 255, 0.03)',
+    borderTopColor: COLORS.primary,
+    borderRightColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: SPACING.md,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  timerText: { 
+    fontSize: 44, 
+    fontWeight: '900', 
+    color: COLORS.text, 
+    fontFamily: 'System',
+  },
   badge: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20 },
   workBadge: { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderWidth: 1, borderColor: COLORS.primary },
   breakBadge: { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 1, borderColor: COLORS.success },
   badgeText: { color: COLORS.text, fontWeight: '800', fontSize: 12 },
   controls: { flexDirection: 'row', gap: 16, marginTop: SPACING.md },
-  btnPlay: { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: RADIUS.md },
+  btnPlay: { 
+    backgroundColor: COLORS.primary, 
+    paddingHorizontal: 28, 
+    paddingVertical: 14, 
+    borderRadius: RADIUS.md,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   btnPlayText: { color: '#fff', fontWeight: '800' },
-  btnReset: { backgroundColor: 'rgba(255,255,255,0.05)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border },
+  btnReset: { backgroundColor: 'rgba(255,255,255,0.03)', paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border },
   btnResetText: { color: COLORS.text, fontWeight: '700' },
   btnDone: { backgroundColor: COLORS.success, paddingHorizontal: 20, paddingVertical: 14, borderRadius: RADIUS.md },
   btnDoneText: { color: '#fff', fontWeight: '800' },
@@ -339,7 +377,7 @@ const styles = StyleSheet.create({
   topicsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.md },
   topicChip: { backgroundColor: COLORS.background, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border },
   activeTopicChip: { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderColor: COLORS.primary },
-  topicChipText: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '600' },
+  topicChipText: { color: COLORS.textMuted, fontSize: 12, fontWeight: '600' },
   activeTopicText: { color: COLORS.text, fontWeight: '800' },
   rowInputs: { flexDirection: 'row', marginTop: SPACING.sm },
   input: { backgroundColor: COLORS.background, color: COLORS.text, padding: 12, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, fontSize: 16, fontWeight: '700', textAlign: 'center' },

@@ -9,7 +9,7 @@ import {
   Animated,
   RefreshControl,
 } from 'react-native';
-import { COLORS, SPACING, RADIUS } from '../theme';
+import { COLORS, SPACING, RADIUS, SHADOWS } from '../theme';
 import { getTimerStats, getTimerSessions } from '../api';
 
 const ROADMAP = [
@@ -189,7 +189,20 @@ export default function StudyPlantScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background, padding: SPACING.md },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
-  plantDisplayCard: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
+  plantDisplayCard: { 
+    backgroundColor: COLORS.card, 
+    borderRadius: RADIUS.lg, 
+    padding: 32, 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: 'rgba(6, 182, 212, 0.25)', 
+    shadowColor: COLORS.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
+    marginBottom: SPACING.lg 
+  },
   plantEmoji: { fontSize: 96, marginVertical: SPACING.md },
   badge: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
   badgeText: { color: COLORS.success, fontWeight: '800', fontSize: 12 },

@@ -11,6 +11,7 @@ import {
 import { COLORS, SPACING, RADIUS, GRADIENTS, SHADOWS } from '../theme';
 import { getStats } from '../api';
 import { evaluateQuests } from '../utils/questHelper';
+import { getPlantLevel } from '../utils/offlineStorage';
 
 const StatCard = ({ label, value, sub, colors, index }) => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
@@ -36,12 +37,16 @@ const StatCard = ({ label, value, sub, colors, index }) => {
   return (
     <Animated.View style={[
       styles.statCard, 
-      SHADOWS.md,
-      { backgroundColor: colors ? colors[0] : COLORS.card },
-      { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }
+      SHADOWS.sm,
+      { 
+        opacity: fadeAnim, 
+        transform: [{ translateY: slideAnim }],
+        borderColor: colors ? colors[0] : COLORS.border,
+        borderWidth: 1.5,
+      }
     ]}>
       <View style={styles.cardContent}>
-        <Text style={styles.statLabel}>{label}</Text>
+        <Text style={[styles.statLabel, { color: colors ? colors[0] : COLORS.textMuted }]}>{label}</Text>
         <Text style={styles.statValue}>{value}</Text>
         <Text style={styles.statSub}>{sub}</Text>
       </View>
@@ -102,6 +107,13 @@ export default function DashboardScreen({ navigation }) {
     );
   }
 
+  const plantInfo = getPlantLevel(stats.totalXP || 0);
+  const xpCurrent = stats.totalXP || 0;
+  const xpNext = plantInfo.next || 1500;
+  const xpPrev = plantInfo.level === 1 ? 0 : (plantInfo.level === 2 ? 50 : (plantInfo.level === 3 ? 150 : (plantInfo.level === 4 ? 300 : (plantInfo.level === 5 ? 500 : (plantInfo.level === 6 ? 800 : 1200)))));
+  const progressRatio = xpNext ? Math.min(1, Math.max(0, (xpCurrent - xpPrev) / (xpNext - xpPrev))) : 1;
+  const progressPercent = Math.round(progressRatio * 100);
+
   return (
     <ScrollView
       style={styles.container}
@@ -110,8 +122,53 @@ export default function DashboardScreen({ navigation }) {
       }
     >
       <View style={styles.header}>
-        <Text style={styles.title}>Dashboard</Text>
-        <Text style={styles.subtitle}>Your learning progress at a glance</Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.welcomeText}>Hello, ghost69! 🚀</Text>
+            <Text style={styles.title}>Ready to Level Up?</Text>
+          </View>
+          <View style={styles.notificationBell}>
+            <Text style={{ fontSize: 20 }}>🔔</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.plantCard}>
+        <View style={styles.plantHeader}>
+          <Text style={styles.plantTitle}>🌱 Study Plant Level Progress</Text>
+          <Text style={styles.plantLevelBadge}>Lv. {plantInfo.level}</Text>
+        </View>
+        
+        <View style={styles.plantContent}>
+          <View style={styles.plantEmojiContainer}>
+            <Text style={styles.plantEmoji}>{plantInfo.emoji}</Text>
+          </View>
+          
+          <View style={styles.plantDetails}>
+            <Text style={styles.plantName}>{plantInfo.name}</Text>
+            <Text style={styles.plantXPText}>
+              XP to Next Level: {xpCurrent} / {xpNext || 'Max'} XP
+            </Text>
+            
+            <View style={styles.segmentedProgressBar}>
+              {Array.from({ length: 10 }).map((_, i) => {
+                const filled = progressRatio * 10 >= i + 1;
+                return (
+                  <View 
+                    key={i} 
+                    style={[
+                      styles.progressSegment, 
+                      filled && styles.progressSegmentFilled,
+                      i === 0 && { borderTopLeftRadius: 4, borderBottomLeftRadius: 4 },
+                      i === 9 && { borderTopRightRadius: 4, borderBottomRightRadius: 4 }
+                    ]}
+                  />
+                );
+              })}
+              <Text style={styles.segmentPercentText}>{progressPercent}%</Text>
+            </View>
+          </View>
+        </View>
       </View>
 
       <View style={styles.statsGrid}>
@@ -378,5 +435,120 @@ const styles = StyleSheet.create({
     color: COLORS.success,
     fontSize: 10,
     fontWeight: '800',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  welcomeText: {
+    color: COLORS.secondary,
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  notificationBell: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  plantCard: {
+    backgroundColor: COLORS.card,
+    marginHorizontal: SPACING.md,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(6, 182, 212, 0.2)', // Cyan glow border
+    marginBottom: SPACING.md,
+  },
+  plantHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+    paddingBottom: 8,
+  },
+  plantTitle: {
+    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  plantLevelBadge: {
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    color: COLORS.text,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  plantContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  plantEmojiContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: RADIUS.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(6, 182, 212, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
+  plantEmoji: {
+    fontSize: 28,
+  },
+  plantDetails: {
+    flex: 1,
+  },
+  plantName: {
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  plantXPText: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    marginBottom: 6,
+  },
+  segmentedProgressBar: {
+    flexDirection: 'row',
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 4,
+    overflow: 'visible',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  progressSegment: {
+    flex: 1,
+    height: '100%',
+    marginHorizontal: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  progressSegmentFilled: {
+    backgroundColor: COLORS.secondary,
+  },
+  segmentPercentText: {
+    position: 'absolute',
+    right: 0,
+    top: -18,
+    fontSize: 10,
+    fontWeight: '800',
+    color: COLORS.secondary,
   },
 });
