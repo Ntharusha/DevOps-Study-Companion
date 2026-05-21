@@ -122,10 +122,20 @@ function Labs() {
               </div>
               <div className="form-group">
                 <label className="form-label">Topic *</label>
-                <select className="form-select" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })}>
-                  <option value="">Select...</option>
-                  {TOPICS.map((t) => <option key={t} value={t}>{t}</option>)}
-                </select>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={form.topic}
+                  onChange={(e) => setForm({ ...form, topic: e.target.value })}
+                  placeholder="e.g. Docker, Python, Git"
+                  list="topics-list"
+                  required
+                />
+                <datalist id="topics-list">
+                  {TOPICS.map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
               </div>
             </div>
             <div className="form-row">

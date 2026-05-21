@@ -34,11 +34,7 @@ const labSchema = new mongoose.Schema(
     topic: {
       type: String,
       required: true,
-      enum: [
-        'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
-        'Ansible', 'Git', 'Networking', 'Monitoring', 'Security',
-        'Scripting', 'Nginx', 'Jenkins', 'Other',
-      ],
+      trim: true,
     },
     description: {
       type: String,

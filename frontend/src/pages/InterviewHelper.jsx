@@ -174,13 +174,20 @@ function InterviewHelper() {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Category</label>
-                <select
-                  className="form-select"
+                <input
+                  type="text"
+                  className="form-input"
                   value={newQuestion.category}
                   onChange={(e) => setNewQuestion({ ...newQuestion, category: e.target.value })}
-                >
-                  {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
-                </select>
+                  placeholder="e.g. General, Docker, Git"
+                  list="categories-list"
+                  required
+                />
+                <datalist id="categories-list">
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat} />
+                  ))}
+                </datalist>
               </div>
               <div className="form-group">
                 <label className="form-label">Difficulty</label>

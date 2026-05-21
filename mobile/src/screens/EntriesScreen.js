@@ -155,7 +155,14 @@ export default function EntriesScreen() {
             <Text style={styles.modalTitle}>Log Daily Work</Text>
             <ScrollView>
               <Text style={styles.label}>Topic</Text>
-              <View style={styles.topicGrid}>
+              <TextInput 
+                style={styles.input} 
+                value={form.topic} 
+                onChangeText={t => setForm({...form, topic: t})} 
+                placeholder="e.g. Docker, Python, Git" 
+                placeholderTextColor={COLORS.textMuted} 
+              />
+              <View style={[styles.topicGrid, { marginTop: 8 }]}>
                 {ENTRY_TOPICS.map(t => (
                   <TouchableOpacity 
                     key={t} 

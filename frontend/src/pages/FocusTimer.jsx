@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { HiOutlinePlay, HiOutlinePause, HiOutlineRefresh, HiOutlineCheck, HiOutlineClock, HiOutlineFire, HiOutlineLightningBolt, HiOutlineChevronUp, HiOutlineChevronDown } from 'react-icons/hi';
 import toast from 'react-hot-toast';
-import { saveTimerSession, getTimerStats } from '../api';
-
-const TOPICS = ['Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform', 'Ansible', 'Git', 'Networking', 'Monitoring', 'Security', 'Scripting', 'Jenkins', 'Other'];
 
 const MODES = [
   { key: 'pomodoro', label: 'Pomodoro', icon: '🍅', defaultWork: 25, defaultBreak: 5 },
@@ -23,7 +20,7 @@ function formatTime(seconds) {
 
 export default function FocusTimer() {
   const [mode, setMode] = useState('pomodoro');
-  const [topic, setTopic] = useState('Docker');
+  const [topic, setTopic] = useState('Study');
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
   const [seconds, setSeconds] = useState(25 * 60);
@@ -33,20 +30,10 @@ export default function FocusTimer() {
   const [autoResume, setAutoResume] = useState(true);
   const [targetSessions, setTargetSessions] = useState(4);
   const [sessionCount, setSessionCount] = useState(0);
-  const [stats, setStats] = useState(null);
-  const [saving, setSaving] = useState(false);
+
   const intervalRef = useRef(null);
   const startedAt = useRef(null);
   const elapsedSeconds = useRef(0);
-
-  useEffect(() => { fetchStats(); }, []);
-
-  const fetchStats = async () => {
-    try {
-      const { data } = await getTimerStats();
-      setStats(data.data);
-    } catch (_) {}
-  };
 
   // Notify if permission available
   const notify = useCallback((msg) => {
@@ -73,7 +60,7 @@ export default function FocusTimer() {
     }
   }, [mode, workMinutes, breakMinutes, phase]);
 
-  const handleComplete = useCallback(async () => {
+  const handleComplete = useCallback(() => {
     setRunning(false);
     clearInterval(intervalRef.current);
     const mins = mode === 'stopwatch'
@@ -84,19 +71,6 @@ export default function FocusTimer() {
       const currentCount = sessionCount + 1;
       setSessionCount(currentCount);
       notify(`🍅 Focus session done! ${mins} min of ${topic}`);
-      // Save session
-      setSaving(true);
-      try {
-        await saveTimerSession({
-          mode,
-          topic,
-          durationMinutes: mins,
-          breakMinutes,
-          completed: true,
-        });
-        fetchStats();
-      } catch (_) {}
-      setSaving(false);
 
       if (autoBreak && mode !== 'stopwatch' && currentCount < targetSessions) {
         setPhase('break');
@@ -177,13 +151,11 @@ export default function FocusTimer() {
   const circumference = 2 * Math.PI * 110;
   const strokeDash = circumference - (progress / 100) * circumference;
 
-  const plantLevel = stats?.plantLevel;
-
   return (
     <div className="animate-in">
       <div className="page-header">
         <h2>🍅 Focus Timer</h2>
-        <p>Pomodoro, Stopwatch & Countdown — track every DevOps session</p>
+        <p>Pomodoro, Stopwatch & Countdown Focus Helper</p>
       </div>
 
       <div className="timer-layout">
@@ -227,7 +199,6 @@ export default function FocusTimer() {
               <div className="timer-label">
                 {phase === 'break' ? 'Break' : topic}
               </div>
-              {saving && <div className="timer-saving">Saving… ✨</div>}
             </div>
           </div>
 
@@ -263,16 +234,21 @@ export default function FocusTimer() {
           </div>
         </div>
 
-        {/* Right: Settings & Stats */}
+        {/* Right: Settings */}
         <div className="timer-sidebar-panel">
           {/* Topic */}
           <div className="card timer-config-card">
             <div className="timer-config-title">⚙️ Session Settings</div>
             <div className="form-group" style={{ marginBottom: 12 }}>
-              <label className="form-label">Topic</label>
-              <select className="form-select" value={topic} onChange={(e) => setTopic(e.target.value)} id="timer-topic">
-                {TOPICS.map((t) => <option key={t}>{t}</option>)}
-              </select>
+              <label className="form-label">Focus Task / Topic</label>
+              <input
+                type="text"
+                className="form-input"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="e.g. Coding, Reading, Writing"
+                id="timer-topic"
+              />
             </div>
 
             {mode !== 'stopwatch' && (
@@ -312,42 +288,6 @@ export default function FocusTimer() {
               </>
             )}
           </div>
-
-          {/* Plant card */}
-          {plantLevel && (
-            <div className="card timer-plant-card">
-              <div className="plant-emoji">{plantLevel.emoji}</div>
-              <div className="plant-name">{plantLevel.name}</div>
-              <div className="plant-xp-bar-wrap">
-                <div
-                  className="plant-xp-bar-fill"
-                  style={{
-                    width: plantLevel.next
-                      ? `${Math.min(100, (stats.totalXP / plantLevel.next) * 100)}%`
-                      : '100%',
-                  }}
-                />
-              </div>
-              <div className="plant-xp-label">
-                {stats.totalXP} XP {plantLevel.next ? `/ ${plantLevel.next}` : '(MAX)'}
-              </div>
-            </div>
-          )}
-
-          {/* Quick stats */}
-          {stats && (
-            <div className="card timer-stats-mini">
-              <div className="timer-stat-row">
-                <HiOutlineClock /> <span>{Math.round(stats.totalMinutes / 60 * 10) / 10}h total</span>
-              </div>
-              <div className="timer-stat-row">
-                <HiOutlineFire /> <span>{stats.weekSessions} sessions this week</span>
-              </div>
-              <div className="timer-stat-row">
-                <HiOutlineLightningBolt /> <span>{stats.totalSessions} all-time sessions</span>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

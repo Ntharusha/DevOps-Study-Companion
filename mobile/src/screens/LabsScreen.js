@@ -149,7 +149,14 @@ export default function LabsScreen() {
               <TextInput style={styles.input} value={form.title} onChangeText={t => setForm({...form, title: t})} placeholder="What's the lab name?" placeholderTextColor={COLORS.textMuted} />
               
               <Text style={styles.label}>Topic</Text>
-              <View style={styles.topicGrid}>
+              <TextInput 
+                style={styles.input} 
+                value={form.topic} 
+                onChangeText={t => setForm({...form, topic: t})} 
+                placeholder="e.g. Docker, Python, Git" 
+                placeholderTextColor={COLORS.textMuted} 
+              />
+              <View style={[styles.topicGrid, { marginTop: 8 }]}>
                 {LAB_TOPICS.map(t => (
                   <TouchableOpacity 
                     key={t} 

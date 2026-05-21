@@ -15,11 +15,7 @@ const questionSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: [
-        'Docker', 'Kubernetes', 'Linux', 'CI/CD', 'AWS', 'Terraform',
-        'Ansible', 'Git', 'Networking', 'Monitoring', 'Security',
-        'General', 'System Design', 'Other',
-      ],
+      trim: true,
     },
     difficulty: {
       type: String,
