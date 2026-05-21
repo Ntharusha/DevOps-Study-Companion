@@ -117,10 +117,20 @@ function Commands() {
               </div>
               <div className="form-group">
                 <label className="form-label">Category *</label>
-                <select className="form-select" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                  <option value="">Select...</option>
-                  {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  placeholder="e.g. Docker, Python, Git"
+                  list="categories-list"
+                  required
+                />
+                <datalist id="categories-list">
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
               </div>
             </div>
             <div className="form-group">

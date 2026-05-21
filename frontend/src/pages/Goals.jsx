@@ -181,9 +181,21 @@ export default function Goals() {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label">Topic *</label>
-                <select className="form-select" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} id="goal-topic-select">
-                  {TOPICS.map((t) => <option key={t}>{t}</option>)}
-                </select>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={form.topic}
+                  onChange={(e) => setForm({ ...form, topic: e.target.value })}
+                  placeholder="e.g. Docker, Python, Git"
+                  list="topics-list"
+                  id="goal-topic-select"
+                  required
+                />
+                <datalist id="topics-list">
+                  {TOPICS.map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
               </div>
               <div className="form-group">
                 <label className="form-label">Target Hours This Week *</label>

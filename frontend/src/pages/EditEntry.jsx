@@ -120,17 +120,22 @@ function EditEntry() {
           <div className="form-row">
             <div className="form-group">
               <label className="form-label" htmlFor="edit-topic">Topic</label>
-              <select
+              <input
+                type="text"
                 id="edit-topic"
                 name="topic"
-                className="form-select"
+                className="form-input"
                 value={form.topic}
                 onChange={handleChange}
-              >
+                placeholder="e.g. Docker, Python, Git"
+                list="topics-list"
+                required
+              />
+              <datalist id="topics-list">
                 {TOPICS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t} value={t} />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="edit-difficulty">Difficulty</label>

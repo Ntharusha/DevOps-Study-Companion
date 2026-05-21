@@ -10,10 +10,6 @@ import {
   Switch,
 } from 'react-native';
 import { COLORS, SPACING, RADIUS } from '../theme';
-import { saveTimerSession, getTimerStats } from '../api';
-
-const TOPICS = ['Docker', 'Kubernetes', 'AWS', 'Linux', 'Git', 'CI/CD', 'Ansible', 'Terraform', 'Other'];
-
 export default function FocusTimerScreen() {
   const [mode, setMode] = useState('pomodoro'); // pomodoro, stopwatch, countdown
   const [phase, setPhase] = useState('work'); // work, break
@@ -21,30 +17,13 @@ export default function FocusTimerScreen() {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [customWorkMin, setCustomWorkMin] = useState('25');
   const [customBreakMin, setCustomBreakMin] = useState('5');
-  const [selectedTopic, setSelectedTopic] = useState('Kubernetes');
-  const [stats, setStats] = useState({ totalSessions: 0, totalHours: 0 });
-  const [loading, setLoading] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState('Study');
   const [targetSessions, setTargetSessions] = useState('4');
   const [sessionCount, setSessionCount] = useState(0);
   const [autoStartBreak, setAutoStartBreak] = useState(true);
   const [autoResumeWork, setAutoResumeWork] = useState(true);
 
   const timerRef = useRef(null);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const { data } = await getTimerStats();
-      if (data.success) {
-        setStats(data.data);
-      }
-    } catch (err) {
-      console.log('Error fetching timer stats:', err);
-    }
-  };
 
   useEffect(() => {
     let interval = null;
@@ -78,7 +57,7 @@ export default function FocusTimerScreen() {
     }
   }, [timeLeft, isActive, mode]);
 
-  const handleSessionComplete = async () => {
+  const handleSessionComplete = () => {
     setIsActive(false);
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -107,24 +86,9 @@ export default function FocusTimerScreen() {
     } else if (mode === 'countdown') {
       alert('Countdown complete! ⏰');
     } else if (mode === 'stopwatch') {
-      alert(`Stopwatch session complete! Logged ${durationMinutes} mins. ⏱️`);
+      alert(`Stopwatch session complete! ${durationMinutes} mins. ⏱️`);
     } else if (mode === 'pomodoro' && phase === 'break') {
       alert('☕ Break over! Time to focus.');
-    }
-
-    try {
-      setLoading(true);
-      await saveTimerSession({
-        mode,
-        durationMinutes,
-        topic: selectedTopic,
-        phase,
-      });
-      fetchStats();
-    } catch (err) {
-      console.log('Error saving session:', err);
-    } finally {
-      setLoading(false);
     }
 
     // Toggle Phase for Pomodoro
@@ -239,20 +203,14 @@ export default function FocusTimerScreen() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Session Settings</Text>
 
-        <Text style={styles.label}>DevOps Topic</Text>
-        <View style={styles.topicsGrid}>
-          {TOPICS.map((t) => (
-            <TouchableOpacity
-              key={t}
-              style={[styles.topicChip, selectedTopic === t && styles.activeTopicChip]}
-              onPress={() => setSelectedTopic(t)}
-            >
-              <Text style={[styles.topicChipText, selectedTopic === t && styles.activeTopicText]}>
-                {t}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <Text style={styles.label}>Focus Task / Topic</Text>
+        <TextInput
+          style={styles.customTopicInput}
+          value={selectedTopic}
+          onChangeText={setSelectedTopic}
+          placeholder="e.g. Coding, Reading, Writing"
+          placeholderTextColor={COLORS.textMuted}
+        />
 
         {mode !== 'stopwatch' && (
           <View>
@@ -299,17 +257,6 @@ export default function FocusTimerScreen() {
             </View>
           </View>
         )}
-      </View>
-
-      <View style={styles.statsCard}>
-        <View style={styles.statCol}>
-          <Text style={styles.statVal}>{stats.totalSessions || 0}</Text>
-          <Text style={styles.statLbl}>Sessions</Text>
-        </View>
-        <View style={styles.statCol}>
-          <Text style={styles.statVal}>{(stats.totalHours || 0).toFixed(1)}h</Text>
-          <Text style={styles.statLbl}>Hours</Text>
-        </View>
       </View>
     </ScrollView>
   );
@@ -374,15 +321,17 @@ const styles = StyleSheet.create({
   card: { backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: SPACING.lg },
   cardTitle: { color: COLORS.text, fontSize: 18, fontWeight: '800', marginBottom: SPACING.md },
   label: { color: COLORS.textMuted, fontSize: 12, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' },
-  topicsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: SPACING.md },
-  topicChip: { backgroundColor: COLORS.background, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border },
-  activeTopicChip: { backgroundColor: 'rgba(99, 102, 241, 0.15)', borderColor: COLORS.primary },
-  topicChipText: { color: COLORS.textMuted, fontSize: 12, fontWeight: '600' },
-  activeTopicText: { color: COLORS.text, fontWeight: '800' },
+  customTopicInput: {
+    backgroundColor: COLORS.background,
+    color: COLORS.text,
+    padding: 12,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: SPACING.md,
+  },
   rowInputs: { flexDirection: 'row', marginTop: SPACING.sm },
   input: { backgroundColor: COLORS.background, color: COLORS.text, padding: 12, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.border, fontSize: 16, fontWeight: '700', textAlign: 'center' },
-  statsCard: { flexDirection: 'row', backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border, marginBottom: 40 },
-  statCol: { flex: 1, alignItems: 'center' },
-  statVal: { color: COLORS.text, fontSize: 28, fontWeight: '800' },
-  statLbl: { color: COLORS.textMuted, fontSize: 12, marginTop: 4 },
 });

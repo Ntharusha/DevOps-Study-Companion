@@ -192,7 +192,14 @@ export default function GoalsScreen({ navigation }) {
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={styles.modalLabel}>Select DevOps Topic</Text>
-              <View style={styles.catGrid}>
+              <TextInput 
+                style={styles.modalInput} 
+                value={selectedTopic} 
+                onChangeText={setSelectedTopic} 
+                placeholder="e.g. Docker, Python, Git" 
+                placeholderTextColor={COLORS.textMuted} 
+              />
+              <View style={[styles.catGrid, { marginTop: 8 }]}>
                 {TOPICS.map(t => (
                   <TouchableOpacity
                     key={t}

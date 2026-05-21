@@ -21,11 +21,7 @@ const errorLogSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: [
-        'Docker', 'Kubernetes', 'Linux', 'Git', 'AWS', 'Terraform',
-        'Ansible', 'Networking', 'Nginx', 'CI/CD', 'Monitoring',
-        'Security', 'Scripting', 'Other',
-      ],
+      trim: true,
     },
     severity: {
       type: String,
