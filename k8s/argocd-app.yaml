@@ -8,7 +8,7 @@ spec:
   source:
     # REPLACE with your actual GitHub repository URL
     repoURL: 'https://github.com/Ntharusha/DevOps-Study-Companion.git'
-    targetRevision: HEAD
+    targetRevision: dev
     path: k8s
   destination:
     server: 'https://kubernetes.default.svc'
