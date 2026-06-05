@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devops-study-companion
+  namespace: argocd
+spec:
+  project: default
+  source:
+    # REPLACE with your actual GitHub repository URL
+    repoURL: 'https://github.com/YOUR_GITHUB_USERNAME/DevOps-Study-Companion.git'
+    targetRevision: HEAD
+    path: k8s
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true       # Automatically delete resources in Kubernetes if they are deleted in Git
+      selfHeal: true    # Automatically revert manual changes in Kubernetes (drift detection)
+    syncOptions:
+      - CreateNamespace=true

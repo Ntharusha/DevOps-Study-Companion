@@ -3,3 +3,18 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Terraform - NEVER commit these
+infrastructure/terraform.tfvars
+infrastructure/.terraform/
+infrastructure/.terraform.lock.hcl
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.backup
+infrastructure/crash.log
+infrastructure/*.tfplan
+
+# SSH Keys
+*.pem
+*.key
+id_rsa
+id_ed25519
