@@ -19,7 +19,7 @@ spec:
       containers:
         - name: backend
           # The CI pipeline will automatically update the tag here on every commit.
-          image: YOUR_DOCKERHUB_USERNAME/devops-daily-tracker-backend:1.0.0
+          image: devops-daily-tracker-backend:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
