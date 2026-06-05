@@ -21,20 +21,20 @@ jobs:
         working-directory: ./backend
 
     steps:
-    - name: 🏗 Checkout repository
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: ⚙️ Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
 
-    - name: 📦 Install dependencies
+    - name: Install dependencies
       run: npm install
 
     # In the future, you can add "npm test" or "npm run lint" here
     # to automatically run your Jest/Mocha tests!
-    - name: ✅ Verify Environment
+    - name: Verify Environment
       run: echo "Backend environment successfully setup!"

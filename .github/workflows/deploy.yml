@@ -14,63 +14,63 @@ jobs:
   # JOB 1: Deploy Backend to EC2
   # ==========================================
   deploy-backend:
-    name: 🖥️ Deploy Backend to EC2
+    name: Deploy Backend to EC2
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
       contains(toJSON(github.event.commits.*.modified), 'backend/')
 
     steps:
-      - name: 🏗 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
-      - name: 📦 Install & verify dependencies
+      - name:  Install & verify dependencies
         run: |
           cd backend
           npm install
 
-      - name: 🔑 Setup SSH Key
+      - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: 🚀 Deploy to EC2 via SSH
+      - name: Deploy to EC2 via SSH
         run: |
           ssh -i ~/.ssh/deploy_key ubuntu@${{ secrets.EC2_HOST }} << 'REMOTE_SCRIPT'
             set -e
-            echo "📥 Pulling latest changes..."
+            echo " Pulling latest changes..."
             cd /app/devops-companion
             git pull origin main
 
-            echo "📦 Installing dependencies..."
+            echo " Installing dependencies..."
             cd backend
             npm install --omit=dev
 
-            echo "♻️ Restarting PM2..."
+            echo " Restarting PM2..."
             pm2 restart devops-companion-backend --update-env
             pm2 save
 
-            echo "✅ Backend deployment complete!"
+            echo " Backend deployment complete!"
             pm2 status devops-companion-backend
           REMOTE_SCRIPT
 
-      - name: 🏥 Health Check
+      - name: Health Check
         run: |
           sleep 10
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.EC2_HOST }}/api/health)
           if [ "$STATUS" = "200" ]; then
-            echo "✅ Health check passed (HTTP $STATUS)"
+            echo " Health check passed (HTTP $STATUS)"
           else
-            echo "❌ Health check failed (HTTP $STATUS)"
+            echo " Health check failed (HTTP $STATUS)"
             exit 1
           fi
 
@@ -78,43 +78,43 @@ jobs:
   # JOB 2: Build & Deploy Frontend to S3
   # ==========================================
   deploy-frontend:
-    name: 🌐 Deploy Frontend to S3 + CloudFront
+    name:  Deploy Frontend to S3 + CloudFront
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
       contains(toJSON(github.event.commits.*.modified), 'frontend/')
 
     steps:
-      - name: 🏗 Checkout repository
+      - name:  Checkout repository
         uses: actions/checkout@v4
 
-      - name: ⚙️ Setup Node.js
+      - name:  Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: 📦 Install dependencies
+      - name:  Install dependencies
         run: |
           cd frontend
           npm install
 
-      - name: 🛠 Build Vite app
+      - name:  Build Vite app
         run: |
           cd frontend
           npm run build
         env:
           VITE_API_URL: http://${{ secrets.EC2_HOST }}/api
 
-      - name: 🔐 Configure AWS credentials
+      - name:  Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 📤 Sync build to S3
+      - name:  Sync build to S3
         run: |
           aws s3 sync frontend/dist/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
             --delete \
@@ -126,16 +126,16 @@ jobs:
             --cache-control "no-cache, no-store, must-revalidate" \
             --content-type "text/html"
 
-      - name: 🔄 Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
 
-      - name: ✅ Deployment summary
+      - name:  Deployment summary
         run: |
-          echo "🎉 Frontend deployed successfully!"
-          echo "🌐 URL: https://$(aws cloudfront get-distribution \
+          echo " Frontend deployed successfully!"
+          echo " URL: https://$(aws cloudfront get-distribution \
             --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --query 'Distribution.DomainName' \
             --output text)"
