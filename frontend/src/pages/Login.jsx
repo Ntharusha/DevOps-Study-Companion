@@ -71,7 +71,7 @@ function Login({ onLogin }) {
         </form>
         
         <div className="login-footer">
-          <p>Personal Use Only • Ghost69</p>
+          <p>DevOps Study Companion • Portfolio Showcase</p>
         </div>
       </div>
       

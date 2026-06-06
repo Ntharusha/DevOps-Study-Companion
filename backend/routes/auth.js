@@ -1,24 +1,24 @@
 const express = require('express');
 const router = express.Router();
 
-// Hardcoded credentials for personal use
-const GHOST_USER = {
-  username: 'ghost69',
-  password: '2001'
+// Load administrative credentials from environment variables, fallback to professional defaults
+const ADMIN_USER = {
+  username: process.env.ADMIN_USERNAME || 'admin',
+  password: process.env.ADMIN_PASSWORD || 'devops123'
 };
 
 // POST /api/auth/login
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  if (username === GHOST_USER.username && password === GHOST_USER.password) {
-    // For personal use, we'll return a simple success response
-    // In a real app, you'd use JWT here.
+  if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
+    // Return a simple success response
+    // For demo/personal portfolio, using a simple auth token
     return res.json({
       success: true,
       user: {
-        username: GHOST_USER.username,
-        token: 'simple-auth-token-ghost69-2001' // Simple static token
+        username: ADMIN_USER.username,
+        token: `token-${ADMIN_USER.username}-${Date.now()}` // Dynamic safe token
       }
     });
   }

@@ -243,7 +243,11 @@ DevOps-Study-Companion/
 │   ├── argocd-app.yaml          # Argo CD Application manifest
 │   ├── backend-deployment.yaml  # K8s Deployment (image tag auto-updated by GitOps)
 │   ├── backend-service.yaml     # K8s Service (ClusterIP, port 5000)
-│   └── mongodb.yaml             # MongoDB Deployment + ClusterIP Service
+│   ├── frontend-deployment.yaml # K8s Deployment (image tag auto-updated by GitOps)
+│   ├── frontend-service.yaml    # K8s Service (ClusterIP, port 80)
+│   ├── mongodb.yaml             # MongoDB Deployment + Service (Volume Mounted)
+│   ├── mongodb-pvc.yaml         # PersistentVolumeClaim for MongoDB storage
+│   └── ingress.yaml             # Ingress routing `/api` to backend, `/` to frontend
 │
 ├── docker-compose.yml           # Full local stack: MongoDB + Backend + Frontend
 ├── run-local.sh                 # One-command local startup script
@@ -282,7 +286,7 @@ git push / pull_request  →  main  or  dev
 | **🔍 detect-changes** | Every push / PR | `dorny/paths-filter` checks which dirs changed | Boolean flags consumed by other jobs |
 | **🌐 ci-frontend** | `frontend/**` changed | Checkout → Node 20 → `npm install` → `npm run build` | `frontend-dist` artifact (7 days) |
 | **🔧 ci-backend** | `backend/**` changed | Checkout → Node 20 → `npm install` → verify env | — |
-| **🐳 gitops** | `backend/**` changed **+** push to `main` only, after `ci-backend` passes | Docker Buildx → Hub login → build & push `:latest` + `:$sha` → `sed` update `k8s/backend-deployment.yaml` → auto-commit `[skip ci]` | Updated K8s manifest → Argo CD syncs cluster |
+| **🐳 gitops** | `backend/**` or `frontend/**` changed **+** push to `main` only, after checks pass | Docker Buildx → Hub login → build & push changed images (`:latest` + `:$sha`) → `sed` update deployment manifests → auto-commit `[skip ci]` | Updated K8s manifests → Argo CD syncs cluster |
 | **📱 build-android** | `mobile/**` changed | Node 20 + Java 17 (Temurin) + Android SDK → `expo prebuild` → `./gradlew assembleRelease` | `devops-companion-apk` artifact (7 days) |
 | **📋 summary** | Always (after all jobs) | Prints pass/fail for every job + commit SHA + branch | Pipeline report in GHA logs |
 
@@ -311,10 +315,14 @@ git push / pull_request  →  main  or  dev
 
 | File | Kind | Details |
 |------|------|---------|
+| `frontend-deployment.yaml` | `Deployment` | 1 replica · liveness & readiness probes · CPU 50–200m · Mem 64–128Mi |
+| `frontend-service.yaml` | `Service` | ClusterIP · port 80 |
 | `backend-deployment.yaml` | `Deployment` | 1 replica · liveness & readiness probes · CPU 100–300m · Mem 128–256Mi |
 | `backend-service.yaml` | `Service` | ClusterIP · port 5000 |
-| `mongodb.yaml` | `Deployment` + `Service` | mongo:6.0 · ClusterIP · CPU 250–500m · Mem 256–512Mi |
-| `argocd-app.yaml` | `Application` | Watches `k8s/` path on `dev` branch · automated sync |
+| `mongodb.yaml` | `Deployment` + `Service` | mongo:6.0 · PVC volume mounted · ClusterIP · CPU 250–500m · Mem 256–512Mi |
+| `mongodb-pvc.yaml` | `PersistentVolumeClaim` | 2Gi storage capacity · ReadWriteOnce access mode |
+| `ingress.yaml` | `Ingress` | Nginx Ingress routing · `/api` -> Backend · `/` -> Frontend |
+| `argocd-app.yaml` | `Application` | Watches `k8s/` path on `main` branch · automated sync |
 
 ### Argo CD Sync Policy
 
@@ -452,9 +460,12 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443
 # 6. Apply the Argo CD Application manifest
 kubectl apply -f k8s/argocd-app.yaml
 
-# 7. Port-forward the backend service
+# 7. Port-forward the services to access locally:
+# Access the React Web App at http://localhost:3000
+kubectl port-forward svc/frontend 3000:80
+
+# Access the Backend API at http://localhost:5000/api/health
 kubectl port-forward svc/backend 5000:5000
-# → http://localhost:5000/api/health
 ```
 
 Once set up, every `git push` to `main` that changes `backend/**` will:
