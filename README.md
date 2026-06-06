@@ -5,15 +5,16 @@
 ![DevOps Study Companion](https://img.shields.io/badge/DevOps-Study%20Companion-6C63FF?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=for-the-badge&logo=node.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![MongoDB](https://img.shields.io/badge/MongoDB-Local-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-kind%20(local)-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-kind%20local-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Unified%20CI%2FCD-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-**A full-stack, multi-platform productivity & learning platform for DevOps engineers — built as a live demonstration of enterprise-grade DevOps practices.**
+**A full-stack, multi-platform productivity & learning platform for DevOps engineers —  
+built as a live demonstration of enterprise-grade DevOps practices running entirely on localhost.**
 
-[Features](#-application-features) • [Architecture](#️-devops-architecture) • [CI/CD Pipeline](#-cicd-pipeline) • [Kubernetes](#-kubernetes--gitops) • [Getting Started](#-getting-started)
+[About](#-about-the-project) • [Architecture](#️-architecture) • [CI/CD](#-cicd-pipeline--cicdyml) • [Kubernetes](#️-kubernetes--gitops) • [Get Started](#-getting-started) • [Features](#-application-features) • [API](#-rest-api-reference)
 
 </div>
 
@@ -21,50 +22,49 @@
 
 ## 📖 About The Project
 
-**DevOps Study Companion** is more than a study tracker — it is a **production-grade, multi-tier monorepo** that implements the full software delivery lifecycle end-to-end. It was built to simultaneously serve as:
+**DevOps Study Companion** is more than a study tracker — it's a **production-grade, multi-tier monorepo** that implements the full software delivery lifecycle end-to-end. Built with two goals:
 
-1. **A functional app** — helping DevOps learners track labs, commands, habits, goals, and focus sessions across Web and Android.
-2. **A portfolio project** — demonstrating real-world CI/CD, containerization, GitOps, Kubernetes orchestration, and infrastructure-as-code skills.
+1. **A functional app** — helps DevOps learners track labs, commands, habits, goals, and focus sessions across Web and Android.
+2. **A portfolio project** — demonstrates real-world CI/CD, containerization, GitOps, and Kubernetes orchestration skills.
 
-> Every file in this repository — from Dockerfiles to GitHub Actions workflows to Kubernetes manifests — reflects how modern software teams ship code to production.
+> Every file in this repo — from Dockerfiles to GitHub Actions workflows to Kubernetes manifests — reflects how modern engineering teams ship software.
 
-> **⚠️ Runtime note:** This project runs entirely on **localhost**. The Kubernetes cluster uses **kind** (Kubernetes IN Docker) and ArgoCD runs locally. No cloud provider is required to run this project.
+> **⚠️ Runs on localhost.** No cloud provider required. The Kubernetes cluster uses **kind** (Kubernetes IN Docker) and Argo CD runs inside that local cluster. The only external services are **GitHub Actions** (CI runner) and **Docker Hub** (image registry, free tier).
 
 ---
 
-## 🏗️ DevOps Architecture
+## 🏗️ Architecture
 
-### High-Level System Architecture
+### System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CLIENTS / CONSUMERS                          │
-│                                                                     │
-│   ┌──────────────────┐         ┌───────────────────────────────┐   │
-│   │  React Web App   │         │   React Native Android App    │   │
-│   │  (Vite + Nginx)  │         │   (Expo SDK 54 + MMKV)        │   │
-│   └────────┬─────────┘         └──────────────┬────────────────┘   │
-│            │                                   │                   │
-└────────────┼───────────────────────────────────┼───────────────────┘
-             │  HTTP / REST API                  │  HTTP / REST API
-┌────────────▼───────────────────────────────────▼───────────────────┐
-│                     BACKEND API LAYER                               │
-│                                                                     │
-│          Node.js + Express  (Port 5000)                             │
-│          ┌──────────────────────────────────────────────┐          │
-│          │  /api/auth     /api/entries   /api/labs       │          │
-│          │  /api/projects /api/habits    /api/goals      │          │
-│          │  /api/timer    /api/commands  /api/errors     │          │
-│          │  /api/memory   /api/reports   /api/interview  │          │
-│          └─────────────────────┬────────────────────────┘          │
-└────────────────────────────────┼───────────────────────────────────┘
-                                 │ Mongoose ODM
-┌────────────────────────────────▼───────────────────────────────────┐
-│                      DATABASE LAYER                                 │
-│                                                                     │
-│                  MongoDB (Local — Port 27017)                       │
-│                  Runs in Docker container                           │
-└─────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│                          CLIENTS / CONSUMERS                          │
+│                                                                       │
+│   ┌──────────────────────┐       ┌─────────────────────────────────┐  │
+│   │   React Web App      │       │   React Native Android App      │  │
+│   │   Vite + Nginx       │       │   Expo SDK 54 + MMKV            │  │
+│   │   http://localhost:3000│     │   (scan QR via Expo Go)         │  │
+│   └──────────┬───────────┘       └────────────────┬────────────────┘  │
+└──────────────┼────────────────────────────────────┼───────────────────┘
+               │  HTTP REST API                      │  HTTP REST API
+┌──────────────▼────────────────────────────────────▼───────────────────┐
+│                         BACKEND API LAYER                             │
+│                                                                       │
+│   Node.js + Express  —  http://localhost:5000                         │
+│   ┌───────────────────────────────────────────────────────────────┐   │
+│   │  /api/auth    /api/entries  /api/labs     /api/projects       │   │
+│   │  /api/habits  /api/goals    /api/timer    /api/commands       │   │
+│   │  /api/errors  /api/memory   /api/reports  /api/interview      │   │
+│   └───────────────────────────────┬───────────────────────────────┘   │
+└───────────────────────────────────┼───────────────────────────────────┘
+                                    │  Mongoose ODM
+┌───────────────────────────────────▼───────────────────────────────────┐
+│                           DATABASE LAYER                              │
+│                                                                       │
+│   MongoDB 6.0  —  mongodb://localhost:27017                           │
+│   Runs as a Docker container (Compose) or K8s Deployment (kind)       │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -72,87 +72,54 @@
 ### DevOps Infrastructure Architecture (Localhost)
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          DEVELOPER WORKSTATION (localhost)                   │
-│                                                                             │
-│    git push → GitHub (main branch)                                          │
-└──────────────────────────────┬──────────────────────────────────────────────┘
-                               │
-                    ┌──────────▼──────────┐
-                    │   GitHub Repository  │
-                    │  (Source of Truth)   │
-                    └──────┬──────┬────────┘
-                           │      │
-          ┌────────────────▼──┐  ┌▼──────────────────────┐
-          │  GitHub Actions   │  │  GitHub Actions         │
-          │  CI Pipelines     │  │  GitOps Pipeline        │
-          │                   │  │                         │
-          │ • frontend_ci.yml │  │ • Build Docker Image    │
-          │ • backend_ci.yml  │  │ • Push to Docker Hub    │
-          │ • android_build   │  │ • Update k8s manifest   │
-          └────────┬──────────┘  │ • Commit back to Git    │
-                   │             └───────────┬─────────────┘
-          ┌────────▼──────────┐              │
-          │  CI Result Only   │  ┌───────────▼──────────────┐
-          │  (build + test)   │  │      Docker Hub          │
-          │  No deployment    │  │  (Container Registry)    │
-          └───────────────────┘  │  ntharusha/backend:sha   │
-                                 └───────────┬──────────────┘
-                                             │
-                                 ┌───────────▼──────────────┐
-                                 │  Argo CD (localhost)      │
-                                 │  Watches Git repo        │
-                                 │  Syncs k8s/ manifests    │
-                                 └───────────┬──────────────┘
-                                             │
-                                 ┌───────────▼──────────────┐
-                                 │   kind Kubernetes Cluster │
-                                 │   (Kubernetes IN Docker)  │
-                                 │                           │
-                                 │  ┌─────────────────────┐  │
-                                 │  │ backend Deployment  │  │
-                                 │  │ replicas: 1         │  │
-                                 │  │ liveness probe      │  │
-                                 │  │ readiness probe     │  │
-                                 │  └─────────────────────┘  │
-                                 │  ┌─────────────────────┐  │
-                                 │  │ MongoDB StatefulSet │  │
-                                 │  │ PVC: mongodb-data   │  │
-                                 │  └─────────────────────┘  │
-                                 └───────────────────────────┘
-```
-
----
-
-### CI/CD Pipeline Flow
-
-```
-┌──────────┐    ┌───────────────────────────────────────────────────────────┐
-│ git push │───▶│                  GITHUB ACTIONS                            │
-│  (main)  │    │                                                           │
-└──────────┘    │  Path: backend/**          Path: frontend/**              │
-                │       │                          │                        │
-                │  ┌────▼────────────┐   ┌─────────▼──────────────┐        │
-                │  │ backend_ci.yml  │   │  frontend_ci.yml        │        │
-                │  │ Install deps    │   │  Install deps           │        │
-                │  │ Validate env    │   │  npm run build (Vite)   │        │
-                │  └────┬────────────┘   └─────────┬──────────────┘        │
-                │       │                           │                       │
-                │       └─────────── CI only ───────┘                      │
-                │             (no cloud deployment)                         │
-                │                                                            │
-                │  ┌──────────────────────────────────────────────────┐     │
-                │  │               gitops.yml (GitOps Path)            │     │
-                │  │                                                   │     │
-                │  │  ├─ Docker Buildx setup                           │     │
-                │  │  ├─ Login to Docker Hub                           │     │
-                │  │  ├─ Build & push image :latest + :${{ sha }}      │     │
-                │  │  ├─ sed update k8s/backend-deployment.yaml        │     │
-                │  │  └─ git-auto-commit → triggers ArgoCD sync        │     │
-                │  └──────────────────────────────────────────────────┘     │
-                │         ↓ ArgoCD (running locally) detects change          │
-                │         ↓ Syncs to kind cluster on localhost               │
-                └───────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                     DEVELOPER WORKSTATION                            │
+│   git push → GitHub (main branch)                                    │
+└──────────────────────────┬───────────────────────────────────────────┘
+                           │
+               ┌───────────▼───────────┐
+               │    GitHub Repository   │
+               │   (Source of Truth)    │
+               └───────┬───────┬────────┘
+                       │       │
+         ┌─────────────▼──┐  ┌─▼──────────────────────┐
+         │ GitHub Actions  │  │  GitHub Actions          │
+         │ ci-cd.yml       │  │  ci-cd.yml (gitops job)  │
+         │                 │  │                          │
+         │ • ci-frontend   │  │ • Docker Buildx          │
+         │ • ci-backend    │  │ • Push to Docker Hub     │
+         │ • build-android │  │ • Update k8s manifest    │
+         └────────┬────────┘  │ • Commit back to Git     │
+                  │           └──────────┬───────────────┘
+         ┌────────▼──────────┐           │
+         │   CI Only         │  ┌────────▼───────────────┐
+         │  (build + test)   │  │      Docker Hub         │
+         │  No deployment    │  │  ntharusha/backend:sha  │
+         └───────────────────┘  └────────┬───────────────┘
+                                         │
+                               ┌─────────▼───────────────┐
+                               │   Argo CD  (localhost)   │
+                               │   Watches GitHub repo    │
+                               │   Polls k8s/ manifests   │
+                               └─────────┬───────────────┘
+                                         │  selfHeal + prune
+                               ┌─────────▼───────────────┐
+                               │  kind Kubernetes Cluster │
+                               │  (Kubernetes IN Docker)  │
+                               │                          │
+                               │  ┌──────────────────┐   │
+                               │  │ backend Deployment│   │
+                               │  │ replicas: 1       │   │
+                               │  │ liveness probe    │   │
+                               │  │ readiness probe   │   │
+                               │  │ CPU/mem limits    │   │
+                               │  └──────────────────┘   │
+                               │  ┌──────────────────┐   │
+                               │  │ MongoDB Deployment│   │
+                               │  │ mongo:6.0         │   │
+                               │  │ ClusterIP Service │   │
+                               │  └──────────────────┘   │
+                               └──────────────────────────┘
 ```
 
 ---
@@ -160,56 +127,54 @@
 ### GitOps Reconciliation Loop
 
 ```
-                    ┌──────────────────────────┐
-                    │    GitHub Repository      │
-                    │  k8s/backend-deploy.yaml  │
-                    │  image: :abc123 (new SHA) │
-                    └──────────┬───────────────┘
-                               │  Argo CD polls every 3 min
-                               │  (or webhook push)
-                    ┌──────────▼───────────────┐
-                    │    Argo CD (localhost)    │
-                    │  Desired State: :abc123   │
-                    │  Actual State:  :xyz789   │
-                    │  Status: OutOfSync ⚠️      │
-                    └──────────┬───────────────┘
-                               │  selfHeal: true
-                               │  prune: true
-                    ┌──────────▼───────────────┐
-                    │  kind Kubernetes Cluster  │
-                    │  Rolling update triggered │
-                    │  Old pod → Terminating    │
-                    │  New pod → Running ✅      │
-                    └──────────────────────────┘
+                  ┌─────────────────────────────┐
+                  │      GitHub Repository       │
+                  │  k8s/backend-deployment.yaml │
+                  │  image: backend:abc123 (new) │
+                  └──────────────┬──────────────┘
+                                 │  Argo CD polls every 3 min
+                  ┌──────────────▼──────────────┐
+                  │      Argo CD (localhost)     │
+                  │  Desired State:  :abc123     │
+                  │  Actual State:   :xyz789     │
+                  │  Status: OutOfSync ⚠️         │
+                  └──────────────┬──────────────┘
+                                 │  selfHeal: true  /  prune: true
+                  ┌──────────────▼──────────────┐
+                  │   kind Kubernetes Cluster    │
+                  │   Rolling update triggered   │
+                  │   Old pod  →  Terminating    │
+                  │   New pod  →  Running ✅      │
+                  └──────────────────────────────┘
 ```
 
 ---
 
-### Docker Compose Architecture (Primary Local Dev)
+### Docker Compose Architecture (Local Dev — Quickest Start)
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│              docker-compose.yml (devops-network)         │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  frontend (React + Nginx)                        │  │
-│  │  Port: 3000 → 80                                 │  │
-│  │  Dockerfile: multi-stage (node → nginx:alpine)   │  │
-│  └────────────────┬─────────────────────────────────┘  │
-│                   │ depends_on: backend                  │
-│  ┌────────────────▼─────────────────────────────────┐  │
-│  │  backend (Node.js Express)                        │  │
-│  │  Port: 5000 → 5000                                │  │
-│  │  Dockerfile: multi-stage (builder → node:alpine)  │  │
-│  │  USER: node (non-root security)                   │  │
-│  └────────────────┬─────────────────────────────────┘  │
-│                   │ depends_on: mongodb                  │
-│  ┌────────────────▼─────────────────────────────────┐  │
-│  │  mongodb (mongo:6.0)                              │  │
-│  │  Port: 27017 → 27017                              │  │
-│  │  Volume: mongodb_data (persistent)                │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│           docker-compose.yml  (devops-network)          │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐  │
+│  │  frontend   React + Nginx                       │  │
+│  │  Port 3000 → 80 (Nginx serves Vite build)       │  │
+│  │  Dockerfile: multi-stage  node → nginx:alpine   │  │
+│  └──────────────────────┬──────────────────────────┘  │
+│                         │ depends_on: backend           │
+│  ┌──────────────────────▼──────────────────────────┐  │
+│  │  backend    Node.js Express                     │  │
+│  │  Port 5000 → 5000                               │  │
+│  │  Dockerfile: multi-stage  builder → node:alpine │  │
+│  │  USER: node  (non-root security)                │  │
+│  └──────────────────────┬──────────────────────────┘  │
+│                         │ depends_on: mongodb           │
+│  ┌──────────────────────▼──────────────────────────┐  │
+│  │  mongodb    mongo:6.0                           │  │
+│  │  Port 27017 → 27017                             │  │
+│  │  Volume: mongodb_data  (persistent)             │  │
+│  └─────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -219,7 +184,7 @@
 ### Application Layer
 
 | Layer | Technology | Version |
-|-------|-----------|---------| 
+|-------|-----------|---------|
 | Web Frontend | React + Vite | 18 / 5.x |
 | Styling | Vanilla CSS (custom design system) | — |
 | Charts | Recharts | 2.x |
@@ -231,15 +196,15 @@
 
 ### DevOps & Infrastructure Layer
 
-| Tool | Purpose | Where it runs |
-|------|---------|---------------|
-| **Docker** | Containerization (multi-stage builds) | localhost |
-| **Docker Compose** | Multi-service orchestration | localhost |
-| **GitHub Actions** | CI/CD automation (5 workflows) | GitHub cloud |
+| Tool | Purpose | Runs on |
+|------|---------|---------|
+| **Docker** | Containerization — multi-stage builds | localhost |
+| **Docker Compose** | Multi-service local orchestration | localhost |
+| **kind** | Kubernetes IN Docker — local cluster | localhost |
+| **Argo CD** | GitOps continuous delivery agent | localhost (in-cluster) |
+| **Nginx** | Reverse proxy + SPA serving | localhost (container) |
+| **GitHub Actions** | Unified CI/CD pipeline (`ci-cd.yml`) | GitHub cloud |
 | **Docker Hub** | Container image registry | cloud (free tier) |
-| **kind** | Kubernetes cluster (Kubernetes IN Docker) | localhost |
-| **Argo CD** | GitOps continuous delivery | localhost (in-cluster) |
-| **Nginx** | Reverse proxy for frontend container | localhost |
 
 ---
 
@@ -250,75 +215,93 @@ DevOps-Study-Companion/
 │
 ├── .github/
 │   └── workflows/
-│       ├── frontend_ci.yml      # CI: Vite build validation
-│       ├── backend_ci.yml       # CI: Node.js dependency validation
-│       ├── android_build.yml    # CD: Android APK build
-│       ├── deploy.yml           # Reference: AWS deployment template (not active)
-│       └── gitops.yml           # GitOps: Docker build → manifest update → ArgoCD
+│       └── ci-cd.yml            # ✅ Unified pipeline: CI + GitOps + Android APK
 │
 ├── backend/
 │   ├── Dockerfile               # Multi-stage Node.js production image
 │   ├── server.js                # Express app entry point
-│   ├── models/                  # Mongoose schemas
+│   ├── .env.example             # Environment variable template
+│   ├── models/                  # Mongoose schemas (12 models)
 │   └── routes/                  # REST API route handlers (12 modules)
 │
 ├── frontend/
-│   ├── Dockerfile               # Multi-stage Vite → Nginx image
-│   ├── nginx.conf               # Custom Nginx config (SPA routing + proxy)
+│   ├── Dockerfile               # Multi-stage Vite build → Nginx image
+│   ├── nginx.conf               # SPA routing + API proxy config
 │   ├── src/
 │   │   ├── pages/               # 17 React page components
 │   │   ├── components/          # Reusable UI components
-│   │   ├── api.js               # Axios API client
-│   │   └── index.css            # Custom design system
+│   │   ├── api.js               # Axios API client (base URL config)
+│   │   └── index.css            # Custom design system tokens
 │   └── vite.config.js
 │
 ├── mobile/
-│   ├── App.js                   # Root navigation + screens
+│   ├── App.js                   # Root navigation + screen registration
 │   ├── src/screens/             # React Native screens
 │   └── eas.json                 # Expo Application Services config
 │
 ├── k8s/
 │   ├── argocd-app.yaml          # Argo CD Application manifest
-│   ├── backend-deployment.yaml  # K8s Deployment (auto-updated by GitOps)
-│   ├── backend-service.yaml     # K8s Service
-│   └── mongodb.yaml             # MongoDB StatefulSet + PVC
+│   ├── backend-deployment.yaml  # K8s Deployment (image tag auto-updated by GitOps)
+│   ├── backend-service.yaml     # K8s Service (ClusterIP, port 5000)
+│   └── mongodb.yaml             # MongoDB Deployment + ClusterIP Service
 │
-├── docker-compose.yml           # Full local stack (MongoDB + Backend + Frontend)
+├── docker-compose.yml           # Full local stack: MongoDB + Backend + Frontend
 ├── run-local.sh                 # One-command local startup script
 └── README.md
 ```
 
 ---
 
-## 🔄 GitHub Actions Workflows
+## 🔄 CI/CD Pipeline — `ci-cd.yml`
 
-### 1. `frontend_ci.yml` — Frontend CI
-- **Trigger**: Push to `main` when `frontend/**` changes
-- **Steps**: Checkout → Setup Node 20 → `npm install` → `npm run build`
-- **Purpose**: Ensures the Vite/React app builds successfully
+All pipelines are consolidated into **one unified workflow** with smart path-based job filtering. Each job fires only when its relevant files change — no unnecessary runs.
 
-### 2. `backend_ci.yml` — Backend CI
-- **Trigger**: Push to `main` when `backend/**` changes
-- **Steps**: Checkout → Setup Node 20 → `npm install`
-- **Purpose**: Validates Node.js dependencies and environment
+### Pipeline Flow
 
-### 3. `android_build.yml` — Mobile CD
-- **Trigger**: Push to `main` (mobile path) or manual dispatch
-- **Steps**: Setup Java → Setup Node → Install Expo → Build signed Debug APK
-- **Output**: Downloadable APK artifact for physical device testing
+```
+git push / pull_request  →  main  or  dev
+│
+├── 🔍 detect-changes     always runs — lightweight path filter
+│         │
+│         ├─ frontend/**  changed? ──→  🌐 ci-frontend
+│         │
+│         ├─ backend/**   changed? ──→  🔧 ci-backend
+│         │                                    │
+│         │                        (must pass) ↓
+│         │                            🐳 gitops   ← push to main ONLY (not PRs)
+│         │
+│         └─ mobile/**    changed? ──→  📱 build-android
+│
+└── 📋 summary            always runs last — prints all job results
+```
 
-### 4. `deploy.yml` — AWS Deployment Reference *(not actively used)*
-> This workflow is included as a **portfolio reference** showing how you would deploy this stack to AWS (EC2 + S3 + CloudFront). It is not connected to live infrastructure and will not run successfully without AWS credentials and a provisioned EC2 instance.
+### Job Reference
 
-### 5. `gitops.yml` — GitOps Pipeline (Docker + ArgoCD)
-- **Trigger**: Push to `main` when `backend/**` changes
-- **Steps**:
-  1. Docker Buildx setup
-  2. Docker Hub login
-  3. Build & push image tagged `:latest` and `:${{ github.sha }}`
-  4. `sed` update `k8s/backend-deployment.yaml` with new SHA tag
-  5. Auto-commit the manifest change back to the repo
-  6. **Argo CD (running locally) detects the git change and syncs the kind cluster**
+| Job | Trigger condition | Steps | Output |
+|-----|------------------|-------|--------|
+| **🔍 detect-changes** | Every push / PR | `dorny/paths-filter` checks which dirs changed | Boolean flags consumed by other jobs |
+| **🌐 ci-frontend** | `frontend/**` changed | Checkout → Node 20 → `npm install` → `npm run build` | `frontend-dist` artifact (7 days) |
+| **🔧 ci-backend** | `backend/**` changed | Checkout → Node 20 → `npm install` → verify env | — |
+| **🐳 gitops** | `backend/**` changed **+** push to `main` only, after `ci-backend` passes | Docker Buildx → Hub login → build & push `:latest` + `:$sha` → `sed` update `k8s/backend-deployment.yaml` → auto-commit `[skip ci]` | Updated K8s manifest → Argo CD syncs cluster |
+| **📱 build-android** | `mobile/**` changed | Node 20 + Java 17 (Temurin) + Android SDK → `expo prebuild` → `./gradlew assembleRelease` | `devops-companion-apk` artifact (7 days) |
+| **📋 summary** | Always (after all jobs) | Prints pass/fail for every job + commit SHA + branch | Pipeline report in GHA logs |
+
+### Smart Behaviours
+
+| Feature | Detail |
+|---------|--------|
+| **Concurrency control** | Cancels stale in-progress runs on the same branch when a new push arrives |
+| **PR-safe GitOps** | Docker push + manifest commit only execute on `push` to `main` — never on pull requests |
+| **Loop prevention** | Auto-commit message contains `[skip ci]` so Argo CD manifest updates don't re-trigger the pipeline |
+| **Docker layer cache** | Uses `type=gha` GitHub Actions cache — faster repeat Docker builds |
+| **Dependency ordering** | `gitops` has `needs: [ci-backend]` — image is only pushed after CI passes |
+
+### Required GitHub Secrets
+
+| Secret | Used in job | Description |
+|--------|------------|-------------|
+| `DOCKER_HUB_USERNAME` | `gitops` | Docker Hub username |
+| `DOCKER_HUB_TOKEN` | `gitops` | Docker Hub access token |
 
 ---
 
@@ -326,30 +309,29 @@ DevOps-Study-Companion/
 
 ### Kubernetes Manifests (`k8s/`)
 
-| Manifest | Resource | Details |
-|----------|----------|---------| 
-| `backend-deployment.yaml` | `Deployment` | 1 replica, liveness + readiness probes, CPU/memory limits |
-| `backend-service.yaml` | `Service` | ClusterIP exposing port 5000 |
-| `mongodb.yaml` | `StatefulSet` | Persistent volume for data durability |
-| `argocd-app.yaml` | `Application` | Argo CD app pointing to `k8s/` path on `dev` branch |
+| File | Kind | Details |
+|------|------|---------|
+| `backend-deployment.yaml` | `Deployment` | 1 replica · liveness & readiness probes · CPU 100–300m · Mem 128–256Mi |
+| `backend-service.yaml` | `Service` | ClusterIP · port 5000 |
+| `mongodb.yaml` | `Deployment` + `Service` | mongo:6.0 · ClusterIP · CPU 250–500m · Mem 256–512Mi |
+| `argocd-app.yaml` | `Application` | Watches `k8s/` path on `dev` branch · automated sync |
 
-### Argo CD Configuration
+### Argo CD Sync Policy
 
 ```yaml
 # k8s/argocd-app.yaml
 syncPolicy:
   automated:
-    prune: true      # Auto-delete orphaned resources
-    selfHeal: true   # Auto-revert manual kubectl changes
+    prune: true      # Auto-delete orphaned K8s resources when removed from Git
+    selfHeal: true   # Auto-revert manual kubectl changes (drift detection)
   syncOptions:
     - CreateNamespace=true
 ```
 
-### Health Checks
-
-The backend Kubernetes pod has both probes configured:
+### Backend Health Probes
 
 ```yaml
+# k8s/backend-deployment.yaml
 livenessProbe:
   httpGet:
     path: /api/health
@@ -365,67 +347,75 @@ readinessProbe:
   periodSeconds: 10
 ```
 
+### Resource Limits
+
+```yaml
+resources:
+  limits:
+    cpu: "300m"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+```
+
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-| Tool | Version | Purpose |
+| Tool | Purpose | Install |
 |------|---------|---------|
-| Node.js | >= 20 | Backend & frontend dev |
-| Docker + Docker Compose | Latest | Container runtime |
-| kind | Latest | Local Kubernetes cluster |
-| kubectl | Latest | Kubernetes CLI |
-| ArgoCD CLI | Latest | GitOps management (optional) |
+| Node.js ≥ 20 | Backend & frontend dev | [nodejs.org](https://nodejs.org) |
+| Docker + Docker Compose | Container runtime | [docker.com](https://docker.com) |
+| kind | Local Kubernetes cluster | `go install sigs.k8s.io/kind@latest` |
+| kubectl | Kubernetes CLI | [kubectl install](https://kubernetes.io/docs/tasks/tools/) |
+| Argo CD CLI | GitOps management (optional) | `brew install argocd` |
 
 ---
 
-### Option A: Docker Compose (Recommended — Quickest Start)
+### ▶️ Option A — Docker Compose (Recommended · Fastest)
 
 ```bash
-# Clone the repository
+# Clone the repo
 git clone https://github.com/Ntharusha/DevOps-Study-Companion.git
 cd DevOps-Study-Companion
 
 # Start all services (MongoDB + Backend + Frontend)
 docker-compose up --build
 
-# Access:
-# Web App  → http://localhost:3000
-# API      → http://localhost:5000/api/health
-# MongoDB  → mongodb://localhost:27017
+# ✅ Access:
+#   Web App  →  http://localhost:3000
+#   API      →  http://localhost:5000/api/health
+#   MongoDB  →  mongodb://localhost:27017
 ```
 
 ---
 
-### Option B: Run Services Manually
+### ▶️ Option B — Run Services Manually
 
-#### 1. Backend API
 ```bash
+# 1. Backend API
 cd backend
-cp .env.example .env        # Set MONGODB_URI=mongodb://localhost:27017/devops-study-companion
+cp .env.example .env          # Set MONGODB_URI=mongodb://localhost:27017/devops-study-companion
 npm install
-npm run dev                 # Runs on http://localhost:5000
-```
+npm run dev                   # → http://localhost:5000
 
-#### 2. Web Frontend
-```bash
+# 2. Web Frontend
 cd frontend
 npm install
-npm run dev                 # Runs on http://localhost:3000
-```
+npm run dev                   # → http://localhost:3000
 
-#### 3. Mobile App (Android)
-```bash
+# 3. Mobile App (Android)
 cd mobile
 npm install
-npx expo start              # Scan QR with Expo Go app
+npx expo start                # Scan QR with Expo Go
 ```
 
 ---
 
-### Option C: One-Line Local Script
+### ▶️ Option C — One-Line Script
 
 ```bash
 chmod +x run-local.sh
@@ -434,85 +424,85 @@ chmod +x run-local.sh
 
 ---
 
-### Option D: Kubernetes + ArgoCD (Full GitOps — Local)
+### ▶️ Option D — Full GitOps Stack (kind + Argo CD)
 
-> Runs the production-like stack entirely on your machine using **kind** and **Argo CD**.
+> Runs the full production-like pipeline entirely on your machine.
 
 ```bash
-# 1. Create a kind cluster
+# 1. Create a local Kubernetes cluster
 kind create cluster --name devops-companion
 
-# 2. Install Argo CD into the cluster
+# 2. Install Argo CD
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+kubectl apply -n argocd \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # 3. Wait for Argo CD to be ready
-kubectl wait --for=condition=available --timeout=120s deployment/argocd-server -n argocd
+kubectl wait --for=condition=available --timeout=120s \
+  deployment/argocd-server -n argocd
 
-# 4. Port-forward the Argo CD UI
+# 4. Get the initial admin password
+kubectl -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath="{.data.password}" | base64 -d && echo
+
+# 5. Open Argo CD UI
 kubectl port-forward svc/argocd-server -n argocd 8080:443
+# → https://localhost:8080   (admin / <password from step 4>)
 
-# 5. Apply the ArgoCD Application manifest
+# 6. Apply the Argo CD Application manifest
 kubectl apply -f k8s/argocd-app.yaml
 
-# Access:
-# Argo CD UI  → https://localhost:8080
-# Backend API → http://localhost:5000/api/health  (after port-forwarding the service)
+# 7. Port-forward the backend service
+kubectl port-forward svc/backend 5000:5000
+# → http://localhost:5000/api/health
 ```
 
----
-
-## 🔐 Required Secrets (for GitOps workflow only)
-
-| Secret | Used In | Description |
-|--------|---------|-------------|
-| `DOCKER_HUB_USERNAME` | `gitops.yml` | Docker Hub username |
-| `DOCKER_HUB_TOKEN` | `gitops.yml` | Docker Hub access token |
-
-> The `deploy.yml` workflow references additional AWS secrets (`EC2_HOST`, `AWS_ACCESS_KEY_ID`, etc.) but that workflow is **not active** — it serves as a reference template for cloud deployment.
+Once set up, every `git push` to `main` that changes `backend/**` will:
+1. Run CI via GitHub Actions (`ci-cd.yml`)
+2. Build and push a new Docker image to Docker Hub
+3. Update `k8s/backend-deployment.yaml` with the new image SHA
+4. Commit the manifest change back to GitHub
+5. Argo CD detects the git change and rolls out the new pod automatically ✅
 
 ---
 
 ## 🎯 Application Features
 
 ### 📊 Dashboard
-Real-time summary of all activity — XP, streaks, recent entries, and weekly study hours with interactive charts (Recharts).
+Real-time summary — XP points, streaks, recent entries, weekly study hours with interactive Recharts graphs.
 
 ### 📝 Study Entries (`/entries`)
-Log daily DevOps study sessions with topic tagging, duration tracking, difficulty ratings, and markdown notes.
+Log daily DevOps study sessions with topic tags, duration, difficulty ratings, and markdown notes.
 
 ### 🧪 Labs (`/labs`)
-Track hands-on lab completions. Each lab records the tool used, status, key learnings, and commands run.
+Track hands-on lab completions. Records tool used, status, key learnings, and commands run.
 
 ### 📋 Projects (`/projects`)
-Track DevOps projects from idea to completion with tech stack, status, and progress notes.
+Track DevOps projects from idea to completion — tech stack, status, and progress notes.
 
 ### ⏱️ Focus Timer (`/timer`)
 - **Pomodoro 🍅 / Stopwatch ⏱️ / Countdown ⏳** modes
-- Auto-start breaks, topic tagging, XP rewards
-- Desktop notifications + live stats panel
+- Auto-start breaks, topic tagging, XP rewards, desktop notifications
 
 ### 📅 Habits Tracker (`/habits`)
 - Weekly grid view with one-click check-off
-- Streak tracking, custom icons, category filters
-- Target days per week configuration
+- Streak tracking, custom icons, category filters, target days per week
 
 ### 🎯 Study Goals (`/goals`)
 - Weekly hour targets per DevOps topic
-- Real-time progress from logged sessions
-- Animated progress bars + 🏆 completion celebration
+- Real-time progress from logged sessions, animated progress bars + 🏆 celebration
 
 ### 🧠 Memory Bank (`/memory`)
-Store key DevOps concepts, snippets, and mental models in a searchable knowledge vault.
+Store DevOps concepts, code snippets, and mental models in a searchable knowledge vault.
 
 ### 💻 Commands (`/commands`)
-Reference library for frequently used CLI commands with category tags and copy-to-clipboard.
+CLI reference library with category tags and one-click copy-to-clipboard.
 
 ### 🐛 Error Log (`/errors`)
 Document production errors and their solutions — a personal runbook.
 
 ### 🎤 Interview Helper (`/interview`)
-Question bank with mock interview mode. Practice and store answers for DevOps technical interviews.
+Question bank with mock interview mode. Practice and store answers for DevOps technical rounds.
 
 ### 📈 Reports (`/reports`)
 Analytics dashboard — study heatmap, topic distribution charts, weekly/monthly breakdowns.
@@ -529,12 +519,12 @@ Analytics dashboard — study heatmap, topic distribution charts, weekly/monthly
 Built with **React Native 0.81 + Expo SDK 54**.
 
 | Feature | Details |
-|---------|---------| 
-| Storage | MMKV (C++ backed, 10x faster than AsyncStorage) |
+|---------|---------|
+| Storage | MMKV (C++ native — 10× faster than AsyncStorage) |
 | Navigation | React Navigation stack |
-| Screens | Projects, Labs, Entries, Dashboard |
-| Build | EAS Build (Expo Application Services) |
-| CI | `android_build.yml` produces signed Debug APK |
+| Screens | Dashboard, Projects, Labs, Study Entries |
+| Build | `expo prebuild` + Gradle `assembleRelease` |
+| CI | `build-android` job in `ci-cd.yml` produces signed APK artifact |
 
 ---
 
@@ -544,42 +534,50 @@ Base URL: `http://localhost:5000/api`
 
 | Endpoint | Methods | Description |
 |----------|---------|-------------|
-| `/health` | GET | Service health check |
-| `/auth` | POST | Authentication |
-| `/entries` | GET, POST, PUT, DELETE | Study entries CRUD |
-| `/labs` | GET, POST, PUT, DELETE | Lab tracking |
-| `/projects` | GET, POST, PUT, DELETE | Project management |
-| `/habits` | GET, POST, PUT, DELETE | Habit tracking + check-off |
-| `/goals` | GET, POST, PUT, DELETE | Weekly study goals |
-| `/timer` | GET, POST | Focus timer sessions |
-| `/commands` | GET, POST, DELETE | Command reference |
-| `/errors` | GET, POST, DELETE | Error log entries |
-| `/memory` | GET, POST, DELETE | Memory bank items |
-| `/interview` | GET, POST, DELETE | Interview Q&A bank |
-| `/reports` | GET | Analytics & aggregations |
+| `/health` | `GET` | Service health check |
+| `/auth` | `POST` | Register / Login |
+| `/entries` | `GET POST PUT DELETE` | Study entries CRUD |
+| `/labs` | `GET POST PUT DELETE` | Lab tracking |
+| `/projects` | `GET POST PUT DELETE` | Project management |
+| `/habits` | `GET POST PUT DELETE` | Habit tracking + check-off |
+| `/goals` | `GET POST PUT DELETE` | Weekly study goals |
+| `/timer` | `GET POST` | Focus timer sessions |
+| `/commands` | `GET POST DELETE` | Command reference library |
+| `/errors` | `GET POST DELETE` | Error log entries |
+| `/memory` | `GET POST DELETE` | Memory bank items |
+| `/interview` | `GET POST DELETE` | Interview Q&A bank |
+| `/reports` | `GET` | Analytics & aggregated data |
 
 ---
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Commit your changes: `git commit -m 'feat: add your feature'`
-4. Push to the branch: `git push origin feature/your-feature`
-5. Open a Pull Request — CI will run automatically
+```bash
+# 1. Fork the repository
+# 2. Create a feature branch
+git checkout -b feature/your-feature
+
+# 3. Make your changes and commit
+git commit -m 'feat: describe your change'
+
+# 4. Push and open a Pull Request
+git push origin feature/your-feature
+```
+
+GitHub Actions CI (`ci-cd.yml`) will automatically run build checks on your PR.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
 
 ---
 
 <div align="center">
 
-**Built to learn DevOps. Deployed locally. Documented for DevOps.**
+**Built to learn DevOps. Deployed locally. Documented for the community.**
 
-*A full-stack monorepo demonstrating React · Node.js · MongoDB · Docker · Kubernetes (kind) · Argo CD · GitHub Actions*
+*React · Node.js · MongoDB · Docker · Kubernetes (kind) · Argo CD · GitHub Actions*
 
 </div>
