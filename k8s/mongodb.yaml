@@ -24,6 +24,9 @@ spec:
             # For local demo, we keep it simple. In production, use Kubernetes Secrets.
             - name: MONGO_INITDB_DATABASE
               value: devops-study-companion
+          volumeMounts:
+            - name: mongodb-storage
+              mountPath: /data/db
           resources:
             limits:
               cpu: "500m"
@@ -31,6 +34,10 @@ spec:
             requests:
               cpu: "250m"
               memory: "256Mi"
+      volumes:
+        - name: mongodb-storage
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
 ---
 apiVersion: v1
 kind: Service
